@@ -4,7 +4,7 @@ import { AuthContext } from "../context/AuthContext";
 import "./Home.css";
 
 const Home = () => {
-  const { user, logout } = useContext(AuthContext);
+  const { user } = useContext(AuthContext);
 
   const features = [
     {
