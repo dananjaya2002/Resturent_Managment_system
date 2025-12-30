@@ -1,23 +1,21 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useAuth } from "../context/AuthContext";
+import { useSocket } from "../context/SocketContext";
 import "./OrderTracking.css";
 
 const OrderTracking = () => {
   const { orderId } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { socket } = useSocket();
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [notification, setNotification] = useState("");
 
-  useEffect(() => {
-    fetchOrder();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [orderId]);
-
-  const fetchOrder = async () => {
+  const fetchOrder = useCallback(async () => {
     try {
       setLoading(true);
       const token = localStorage.getItem("token");
@@ -39,7 +37,47 @@ const OrderTracking = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [orderId]);
+
+  useEffect(() => {
+    fetchOrder();
+  }, [fetchOrder]);
+
+  // Listen for real-time order status updates
+  useEffect(() => {
+    if (!socket || !order) return;
+
+    const handleOrderStatusUpdate = (data) => {
+      // Only update if it's this specific order
+      if (data.orderId === orderId) {
+        setNotification(
+          `Order status updated to: ${data.orderStatus
+            .toUpperCase()
+            .replace("-", " ")}`
+        );
+        setTimeout(() => setNotification(""), 5000);
+        fetchOrder(); // Refresh order data
+      }
+    };
+
+    const handlePaymentStatusUpdate = (data) => {
+      if (data.orderId === orderId) {
+        setNotification(
+          `Payment status updated to: ${data.paymentStatus.toUpperCase()}`
+        );
+        setTimeout(() => setNotification(""), 5000);
+        fetchOrder();
+      }
+    };
+
+    socket.on("orderStatusUpdated", handleOrderStatusUpdate);
+    socket.on("paymentStatusUpdated", handlePaymentStatusUpdate);
+
+    return () => {
+      socket.off("orderStatusUpdated", handleOrderStatusUpdate);
+      socket.off("paymentStatusUpdated", handlePaymentStatusUpdate);
+    };
+  }, [socket, orderId, order, fetchOrder]);
 
   const handleCancelOrder = async () => {
     if (!window.confirm("Are you sure you want to cancel this order?")) {
@@ -139,6 +177,26 @@ const OrderTracking = () => {
 
   return (
     <div className="order-tracking-container">
+      {/* Real-time notification banner */}
+      {notification && (
+        <div
+          style={{
+            position: "fixed",
+            top: "20px",
+            right: "20px",
+            background: "#4caf50",
+            color: "white",
+            padding: "1rem 1.5rem",
+            borderRadius: "8px",
+            boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
+            zIndex: 1000,
+            animation: "slideIn 0.3s ease",
+          }}
+        >
+          🔔 {notification}
+        </div>
+      )}
+
       <div className="order-tracking-header">
         <button onClick={() => navigate("/orders")} className="back-btn">
           ← Back to Orders

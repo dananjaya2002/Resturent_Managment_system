@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useCallback } from "react";
 import { AuthContext } from "../context/AuthContext";
+import { useSocket } from "../context/SocketContext";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
@@ -7,8 +8,9 @@ const API_URL = "http://localhost:5000/api";
 
 const AdminDashboard = () => {
   const { user } = useContext(AuthContext);
+  const { socket } = useSocket();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState("menu");
+  const [activeTab, setActiveTab] = useState("orders");
 
   const [menuItems, setMenuItems] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -41,6 +43,47 @@ const AdminDashboard = () => {
     order: 0,
   });
 
+  // Define fetch functions before useEffect hooks that use them
+  const getAuthHeaders = useCallback(() => {
+    const token = localStorage.getItem("token");
+    return { headers: { Authorization: `Bearer ${token}` } };
+  }, []);
+
+  const fetchMenuItems = useCallback(async () => {
+    try {
+      setLoading(true);
+      const { data } = await axios.get(`${API_URL}/menu`);
+      setMenuItems(data);
+    } catch (err) {
+      setError("Failed to fetch menu items");
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const fetchCategories = useCallback(async () => {
+    try {
+      const { data } = await axios.get(`${API_URL}/categories`);
+      setCategories(data);
+    } catch (error) {
+      console.error("Failed to fetch categories:", error);
+    }
+  }, []);
+
+  const fetchOrders = useCallback(async () => {
+    try {
+      setLoading(true);
+      const { data } = await axios.get(`${API_URL}/orders`, getAuthHeaders());
+      setOrders(data.orders || data);
+    } catch (err) {
+      setError("Failed to fetch orders");
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  }, [getAuthHeaders]);
+
   // Check if user is admin
   useEffect(() => {
     if (!user || user.role !== "admin") {
@@ -54,47 +97,28 @@ const AdminDashboard = () => {
       fetchMenuItems();
       fetchOrders();
     }
-  }, [user]);
+  }, [user, fetchCategories, fetchMenuItems, fetchOrders]);
 
-  const getAuthHeaders = () => {
-    const token = localStorage.getItem("token");
-    return { headers: { Authorization: `Bearer ${token}` } };
-  };
+  // Listen for real-time order updates
+  useEffect(() => {
+    if (!socket || !user || user.role !== "admin") return;
 
-  const fetchMenuItems = async () => {
-    try {
-      setLoading(true);
-      const { data } = await axios.get(`${API_URL}/menu`);
-      setMenuItems(data);
-    } catch (err) {
-      setError("Failed to fetch menu items");
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
+    const handleOrderStatusUpdate = () => {
+      fetchOrders(); // Auto-refresh orders when any order is updated
+    };
 
-  const fetchCategories = async () => {
-    try {
-      const { data } = await axios.get(`${API_URL}/categories`);
-      setCategories(data);
-    } catch (error) {
-      console.error("Failed to fetch categories:", error);
-    }
-  };
+    const handlePaymentStatusUpdate = () => {
+      fetchOrders();
+    };
 
-  const fetchOrders = async () => {
-    try {
-      setLoading(true);
-      const { data } = await axios.get(`${API_URL}/orders`, getAuthHeaders());
-      setOrders(data.orders || data);
-    } catch (err) {
-      setError("Failed to fetch orders");
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
+    socket.on("orderStatusUpdated", handleOrderStatusUpdate);
+    socket.on("paymentStatusUpdated", handlePaymentStatusUpdate);
+
+    return () => {
+      socket.off("orderStatusUpdated", handleOrderStatusUpdate);
+      socket.off("paymentStatusUpdated", handlePaymentStatusUpdate);
+    };
+  }, [socket, user, fetchOrders]);
 
   const handleUpdateOrderStatus = async (orderId, newStatus) => {
     try {

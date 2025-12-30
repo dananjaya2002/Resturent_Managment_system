@@ -50,10 +50,10 @@
     - [x] Build Cart Component
     - [x] Build Checkout Page
     - [x] Build Order History/Tracking Page
-- [ ] **Phase 5: Real-time Communication (WebSockets)**
-  - [ ] Setup Socket.IO on Backend
-  - [ ] Setup Socket.IO Client
-  - [ ] Implement Real-time Order Status Updates
+- [x] **Phase 5: Real-time Communication (WebSockets)**
+  - [x] Setup Socket.IO on Backend
+  - [x] Setup Socket.IO Client
+  - [x] Implement Real-time Order Status Updates
 - [ ] **Phase 6: Testing & Finishing Touches**
   - [ ] Unit Testing (Jest)
   - [ ] Integration Testing

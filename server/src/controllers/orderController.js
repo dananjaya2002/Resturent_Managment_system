@@ -201,6 +201,17 @@ const updateOrderStatus = async (req, res) => {
       .populate("user", "name email")
       .populate("items.menuItem", "name imageUrl");
 
+    // Emit socket event for real-time update
+    const io = req.app.get("socketio");
+    if (io) {
+      io.emit("orderStatusUpdated", {
+        orderId: updatedOrder._id,
+        orderNumber: updatedOrder.orderNumber,
+        orderStatus: updatedOrder.orderStatus,
+        userId: updatedOrder.user._id,
+      });
+    }
+
     res.json(updatedOrder);
   } catch (error) {
     res.status(400).json({ message: error.message });
@@ -232,6 +243,17 @@ const updatePaymentStatus = async (req, res) => {
     const updatedOrder = await Order.findById(order._id)
       .populate("user", "name email")
       .populate("items.menuItem", "name imageUrl");
+
+    // Emit socket event for real-time update
+    const io = req.app.get("socketio");
+    if (io) {
+      io.emit("paymentStatusUpdated", {
+        orderId: updatedOrder._id,
+        orderNumber: updatedOrder.orderNumber,
+        paymentStatus: updatedOrder.paymentStatus,
+        userId: updatedOrder.user._id,
+      });
+    }
 
     res.json(updatedOrder);
   } catch (error) {

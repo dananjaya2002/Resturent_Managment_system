@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import { useCart } from "../context/CartContext";
 
@@ -12,22 +12,16 @@ const Menu = () => {
   const [error, setError] = useState("");
   const { addToCart } = useCart();
 
-  useEffect(() => {
-    fetchCategories();
-    fetchMenuItems();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedCategory]);
-
-  const fetchCategories = async () => {
+  const fetchCategories = useCallback(async () => {
     try {
       const { data } = await axios.get(`${API_URL}/categories`);
       setCategories(data);
     } catch (err) {
       console.error("Failed to fetch categories:", err);
     }
-  };
+  }, []);
 
-  const fetchMenuItems = async () => {
+  const fetchMenuItems = useCallback(async () => {
     try {
       setLoading(true);
       const url =
@@ -44,7 +38,12 @@ const Menu = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [selectedCategory]);
+
+  useEffect(() => {
+    fetchCategories();
+    fetchMenuItems();
+  }, [fetchCategories, fetchMenuItems]);
 
   const handleAddToCart = (item) => {
     addToCart(item, 1);

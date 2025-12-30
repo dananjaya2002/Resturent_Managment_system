@@ -10,6 +10,10 @@ jest.mock("../models/Order");
 jest.mock("../models/MenuItem");
 jest.mock("../models/User");
 
+// Mock Socket.IO
+const mockEmit = jest.fn();
+app.set("socketio", { emit: mockEmit });
+
 let userToken;
 let adminToken;
 let orderId = "mockOrderId123";
@@ -30,6 +34,7 @@ beforeAll(() => {
 
 beforeEach(() => {
   jest.clearAllMocks();
+  mockEmit.mockClear();
 });
 
 describe("Order API Tests", () => {
@@ -274,7 +279,7 @@ describe("Order API Tests", () => {
   });
 
   describe("PUT /api/orders/:id/status", () => {
-    it("should update order status (admin only)", async () => {
+    it("should update order status and emit socket event (admin only)", async () => {
       User.findById.mockReturnValue({
         select: jest.fn().mockResolvedValue({
           _id: "mockAdminId123",
@@ -292,7 +297,9 @@ describe("Order API Tests", () => {
         populate: jest.fn().mockReturnValue({
           populate: jest.fn().mockResolvedValue({
             _id: orderId,
+            orderNumber: "ORD123456",
             orderStatus: "confirmed",
+            user: { _id: "mockUserId123" },
           }),
         }),
       });
@@ -304,6 +311,14 @@ describe("Order API Tests", () => {
 
       expect(res.statusCode).toBe(200);
       expect(res.body.orderStatus).toBe("confirmed");
+
+      // Verify socket.io event was emitted
+      expect(mockEmit).toHaveBeenCalledWith("orderStatusUpdated", {
+        orderId: orderId,
+        orderNumber: "ORD123456",
+        orderStatus: "confirmed",
+        userId: "mockUserId123",
+      });
     });
 
     it("should fail to update order status without admin role", async () => {

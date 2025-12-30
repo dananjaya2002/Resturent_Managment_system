@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useState, useEffect } from "react";
 import PropTypes from "prop-types";
 
@@ -12,19 +13,19 @@ export const useCart = () => {
 };
 
 export const CartProvider = ({ children }) => {
-  const [cartItems, setCartItems] = useState([]);
-
-  // Load cart from localStorage on mount
-  useEffect(() => {
+  // Use lazy initialization to load from localStorage only once
+  const [cartItems, setCartItems] = useState(() => {
     const savedCart = localStorage.getItem("cart");
     if (savedCart) {
       try {
-        setCartItems(JSON.parse(savedCart));
+        return JSON.parse(savedCart);
       } catch (error) {
         console.error("Error loading cart from localStorage:", error);
+        return [];
       }
     }
-  }, []);
+    return [];
+  });
 
   // Save cart to localStorage whenever it changes
   useEffect(() => {

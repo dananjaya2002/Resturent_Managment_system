@@ -2,6 +2,7 @@ import React, { useContext } from "react";
 import { Routes, Route, Link, useNavigate } from "react-router-dom";
 import { AuthProvider, AuthContext } from "./context/AuthContext";
 import { CartProvider } from "./context/CartContext";
+import { SocketProvider } from "./context/SocketContext";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Menu from "./pages/Menu";
@@ -138,25 +139,27 @@ const Navigation = () => {
 function App() {
   return (
     <AuthProvider>
-      <CartProvider>
-        <div className="app">
-          <Navigation />
-          <Cart />
+      <SocketProvider>
+        <CartProvider>
+          <div className="app">
+            <Navigation />
+            <Cart />
 
-          <main style={{ padding: "2rem 0" }}>
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
-              <Route path="/menu" element={<Menu />} />
-              <Route path="/checkout" element={<Checkout />} />
-              <Route path="/orders" element={<OrderHistory />} />
-              <Route path="/orders/:orderId" element={<OrderTracking />} />
-              <Route path="/admin" element={<AdminDashboard />} />
-            </Routes>
-          </main>
-        </div>
-      </CartProvider>
+            <main style={{ padding: "2rem 0" }}>
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
+                <Route path="/menu" element={<Menu />} />
+                <Route path="/checkout" element={<Checkout />} />
+                <Route path="/orders" element={<OrderHistory />} />
+                <Route path="/orders/:orderId" element={<OrderTracking />} />
+                <Route path="/admin" element={<AdminDashboard />} />
+              </Routes>
+            </main>
+          </div>
+        </CartProvider>
+      </SocketProvider>
     </AuthProvider>
   );
 }
