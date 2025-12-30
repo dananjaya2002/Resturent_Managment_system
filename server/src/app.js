@@ -7,9 +7,28 @@ const app = express();
 
 // Middleware
 app.use(express.json());
+
+// CORS configuration - allow multiple origins
+const allowedOrigins = [
+  'http://localhost:5173',
+  'http://localhost:3000',
+  process.env.CLIENT_URL,
+  'https://resturent-managment-system-nu.vercel.app'
+].filter(Boolean);
+
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || "http://localhost:5173",
+    origin: function (origin, callback) {
+      // Allow requests with no origin (mobile apps, curl, etc)
+      if (!origin) return callback(null, true);
+      
+      if (allowedOrigins.indexOf(origin) !== -1) {
+        callback(null, true);
+      } else {
+        console.log('Blocked origin:', origin);
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
     credentials: true,
   })
 );
