@@ -120,7 +120,9 @@ const AdminDashboard = () => {
       fetchOrders();
       setError("");
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to update payment status");
+      setError(
+        err.response?.data?.message || "Failed to update payment status"
+      );
     }
   };
 
@@ -344,10 +346,17 @@ const AdminDashboard = () => {
                         <h3 style={{ margin: "0 0 0.5rem 0" }}>
                           Order #{order.orderNumber}
                         </h3>
-                        <p style={{ margin: 0, color: "var(--text-secondary)" }}>
+                        <p
+                          style={{ margin: 0, color: "var(--text-secondary)" }}
+                        >
                           {formatDate(order.createdAt)}
                         </p>
-                        <p style={{ margin: "0.25rem 0 0 0", color: "var(--text-secondary)" }}>
+                        <p
+                          style={{
+                            margin: "0.25rem 0 0 0",
+                            color: "var(--text-secondary)",
+                          }}
+                        >
                           Customer: {order.user?.name || "N/A"}
                         </p>
                       </div>
@@ -365,7 +374,13 @@ const AdminDashboard = () => {
                         >
                           {order.orderStatus.toUpperCase().replace("-", " ")}
                         </div>
-                        <div style={{ fontSize: "1.5rem", fontWeight: "bold", color: "var(--primary-color)" }}>
+                        <div
+                          style={{
+                            fontSize: "1.5rem",
+                            fontWeight: "bold",
+                            color: "var(--primary-color)",
+                          }}
+                        >
                           ${order.totalAmount.toFixed(2)}
                         </div>
                       </div>
@@ -394,7 +409,8 @@ const AdminDashboard = () => {
                     <div style={{ marginBottom: "1rem" }}>
                       <h4>Delivery Address:</h4>
                       <p style={{ margin: "0.5rem 0" }}>
-                        {order.deliveryAddress.street}, {order.deliveryAddress.city},{" "}
+                        {order.deliveryAddress.street},{" "}
+                        {order.deliveryAddress.city},{" "}
                         {order.deliveryAddress.postalCode}
                       </p>
                       <p style={{ margin: "0.5rem 0" }}>
@@ -409,58 +425,107 @@ const AdminDashboard = () => {
                       </span>
                     </div>
 
-                    <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap" }}>
+                    <div
+                      style={{ display: "flex", gap: "1rem", flexWrap: "wrap" }}
+                    >
                       <div>
                         <strong>Update Order Status:</strong>
-                        <div style={{ display: "flex", gap: "0.5rem", marginTop: "0.5rem", flexWrap: "wrap" }}>
-                          {["confirmed", "preparing", "ready", "out-for-delivery", "delivered"].map((status) => (
+                        <div
+                          style={{
+                            display: "flex",
+                            gap: "0.5rem",
+                            marginTop: "0.5rem",
+                            flexWrap: "wrap",
+                          }}
+                        >
+                          {[
+                            "confirmed",
+                            "preparing",
+                            "ready",
+                            "out-for-delivery",
+                            "delivered",
+                          ].map((status) => (
                             <button
                               key={status}
-                              onClick={() => handleUpdateOrderStatus(order._id, status)}
+                              onClick={() =>
+                                handleUpdateOrderStatus(order._id, status)
+                              }
                               className="btn"
                               style={{
                                 padding: "0.5rem 1rem",
                                 fontSize: "0.875rem",
-                                background: order.orderStatus === status ? getStatusColor(status) : "#f5f5f5",
-                                color: order.orderStatus === status ? "white" : "#333",
-                                border: order.orderStatus === status ? "none" : "1px solid #ddd",
+                                background:
+                                  order.orderStatus === status
+                                    ? getStatusColor(status)
+                                    : "#f5f5f5",
+                                color:
+                                  order.orderStatus === status
+                                    ? "white"
+                                    : "#333",
+                                border:
+                                  order.orderStatus === status
+                                    ? "none"
+                                    : "1px solid #ddd",
                               }}
                               disabled={order.orderStatus === status}
                             >
                               {status.replace("-", " ")}
                             </button>
                           ))}
-                          {order.orderStatus !== "cancelled" && order.orderStatus !== "delivered" && (
-                            <button
-                              onClick={() => handleUpdateOrderStatus(order._id, "cancelled")}
-                              className="btn"
-                              style={{
-                                padding: "0.5rem 1rem",
-                                fontSize: "0.875rem",
-                                background: "#f44336",
-                                color: "white",
-                              }}
-                            >
-                              Cancel
-                            </button>
-                          )}
+                          {order.orderStatus !== "cancelled" &&
+                            order.orderStatus !== "delivered" && (
+                              <button
+                                onClick={() =>
+                                  handleUpdateOrderStatus(
+                                    order._id,
+                                    "cancelled"
+                                  )
+                                }
+                                className="btn"
+                                style={{
+                                  padding: "0.5rem 1rem",
+                                  fontSize: "0.875rem",
+                                  background: "#f44336",
+                                  color: "white",
+                                }}
+                              >
+                                Cancel
+                              </button>
+                            )}
                         </div>
                       </div>
 
                       <div>
                         <strong>Update Payment Status:</strong>
-                        <div style={{ display: "flex", gap: "0.5rem", marginTop: "0.5rem" }}>
+                        <div
+                          style={{
+                            display: "flex",
+                            gap: "0.5rem",
+                            marginTop: "0.5rem",
+                          }}
+                        >
                           {["pending", "paid", "failed"].map((status) => (
                             <button
                               key={status}
-                              onClick={() => handleUpdatePaymentStatus(order._id, status)}
+                              onClick={() =>
+                                handleUpdatePaymentStatus(order._id, status)
+                              }
                               className="btn"
                               style={{
                                 padding: "0.5rem 1rem",
                                 fontSize: "0.875rem",
-                                background: order.paymentStatus === status ? "#4caf50" : "#f5f5f5",
-                                color: order.paymentStatus === status ? "white" : "#333",
-                                border: order.paymentStatus === status ? "none" : "1px solid #ddd",
+                                background:
+                                  order.paymentStatus === status
+                                    ? "#4caf50"
+                                    : "#f5f5f5",
+                                color:
+                                  order.paymentStatus === status
+                                    ? "white"
+                                    : "#333",
+                                border:
+                                  order.paymentStatus === status
+                                    ? "none"
+                                    : "1px solid #ddd",
                               }}
                               disabled={order.paymentStatus === status}
                             >
