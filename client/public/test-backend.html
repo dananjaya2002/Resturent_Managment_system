@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Backend Connection Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .test-result {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            white-space: pre-wrap;
+        }
+        .success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background-color: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: white;
+            font-size: 16px;
+        }
+        button:hover { background-color: #0056b3; }
+        #results { margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <h1>Backend Connection Test</h1>
+    <p>Current API URL: <strong id="apiUrl"></strong></p>
+    
+    <div>
+        <button onclick="testConnection()">Test Basic Connection</button>
+        <button onclick="testRegister()">Test Registration</button>
+        <button onclick="testLogin()">Test Login</button>
+    </div>
+    
+    <div id="results"></div>
+
+    <script>
+        // Get API URL from environment or use default
+        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+        document.getElementById('apiUrl').textContent = API_URL;
+
+        function addResult(message, type = 'info') {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = `test-result ${type}`;
+            div.textContent = message;
+            results.appendChild(div);
+        }
+
+        async function testConnection() {
+            addResult('Testing connection to: ' + API_URL, 'info');
+            
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.text();
+                
+                if (response.ok) {
+                    addResult(`✅ Connection successful!\nStatus: ${response.status}\nResponse: ${data}`, 'success');
+                } else {
+                    addResult(`⚠️ Connection made but returned error:\nStatus: ${response.status}\nResponse: ${data}`, 'error');
+                }
+            } catch (error) {
+                addResult(`❌ Connection failed!\nError: ${error.message}\n\nPossible issues:\n1. Backend is not running\n2. Wrong API URL\n3. CORS not configured\n4. Network error`, 'error');
+            }
+        }
+
+        async function testRegister() {
+            addResult('Testing registration endpoint...', 'info');
+            
+            const testUser = {
+                name: 'Test User',
+                email: `test${Date.now()}@example.com`,
+                password: 'Test123!',
+                phone: '1234567890'
+            };
+            
+            addResult(`Sending data: ${JSON.stringify(testUser, null, 2)}`, 'info');
+            
+            try {
+                const response = await fetch(`${API_URL}/api/auth/register`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(testUser)
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    addResult(`✅ Registration successful!\nStatus: ${response.status}\nResponse: ${JSON.stringify(data, null, 2)}`, 'success');
+                } else {
+                    addResult(`❌ Registration failed!\nStatus: ${response.status}\nResponse: ${JSON.stringify(data, null, 2)}`, 'error');
+                }
+            } catch (error) {
+                addResult(`❌ Registration request failed!\nError: ${error.message}`, 'error');
+            }
+        }
+
+        async function testLogin() {
+            addResult('Testing login endpoint...', 'info');
+            
+            const credentials = {
+                email: 'test@example.com',
+                password: 'Test123!'
+            };
+            
+            addResult(`Sending credentials: ${JSON.stringify(credentials, null, 2)}`, 'info');
+            
+            try {
+                const response = await fetch(`${API_URL}/api/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(credentials)
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    addResult(`✅ Login successful!\nStatus: ${response.status}\nResponse: ${JSON.stringify(data, null, 2)}`, 'success');
+                } else {
+                    addResult(`❌ Login failed!\nStatus: ${response.status}\nResponse: ${JSON.stringify(data, null, 2)}`, 'error');
+                }
+            } catch (error) {
+                addResult(`❌ Login request failed!\nError: ${error.message}`, 'error');
+            }
+        }
+
+        // Auto-run basic connection test on load
+        window.onload = () => {
+            testConnection();
+        };
+    </script>
+</body>
+</html>
