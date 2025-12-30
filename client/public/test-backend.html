@@ -52,6 +52,18 @@
   </head>
   <body>
     <h1>Backend Connection Test</h1>
+
+    <div style="margin-bottom: 20px">
+      <label for="apiInput">API URL:</label>
+      <input
+        type="text"
+        id="apiInput"
+        value="resturentmanagmentsystem-production.up.railway.app"
+        style="width: 500px; padding: 8px; font-size: 14px"
+      />
+      <button onclick="updateApiUrl()">Update URL</button>
+    </div>
+
     <p>Current API URL: <strong id="apiUrl"></strong></p>
 
     <div>
@@ -63,108 +75,155 @@
     <div id="results"></div>
 
     <script>
-      // Get API URL from environment or use default
-      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-      document.getElementById('apiUrl').textContent = API_URL;
+      // Default API URL
+      let API_URL =
+        "https://resturent-managment-system-production.up.railway.app";
 
-      function addResult(message, type = 'info') {
-          const results = document.getElementById('results');
-          const div = document.createElement('div');
-          div.className = `test-result ${type}`;
-          div.textContent = message;
-          results.appendChild(div);
+      function updateApiUrl() {
+        API_URL = document.getElementById("apiInput").value;
+        document.getElementById("apiUrl").textContent = API_URL;
+        addResult("API URL updated to: " + API_URL, "info");
+      }
+
+      // Initialize on load
+      document.getElementById("apiUrl").textContent = API_URL;
+
+      function addResult(message, type = "info") {
+        const results = document.getElementById("results");
+        const div = document.createElement("div");
+        div.className = `test-result ${type}`;
+        div.textContent = message;
+        results.appendChild(div);
       }
 
       async function testConnection() {
-          addResult('Testing connection to: ' + API_URL, 'info');
+        addResult("Testing connection to: " + API_URL, "info");
 
-          try {
-              const response = await fetch(API_URL, {
-                  method: 'GET',
-                  headers: {
-                      'Content-Type': 'application/json'
-                  }
-              });
+        try {
+          const response = await fetch(API_URL, {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          });
 
-              const data = await response.text();
+          const data = await response.text();
 
-              if (response.ok) {
-                  addResult(`✅ Connection successful!\nStatus: ${response.status}\nResponse: ${data}`, 'success');
-              } else {
-                  addResult(`⚠️ Connection made but returned error:\nStatus: ${response.status}\nResponse: ${data}`, 'error');
-              }
-          } catch (error) {
-              addResult(`❌ Connection failed!\nError: ${error.message}\n\nPossible issues:\n1. Backend is not running\n2. Wrong API URL\n3. CORS not configured\n4. Network error`, 'error');
+          if (response.ok) {
+            addResult(
+              `✅ Connection successful!\nStatus: ${response.status}\nResponse: ${data}`,
+              "success"
+            );
+          } else {
+            addResult(
+              `⚠️ Connection made but returned error:\nStatus: ${response.status}\nResponse: ${data}`,
+              "error"
+            );
           }
+        } catch (error) {
+          addResult(
+            `❌ Connection failed!\nError: ${error.message}\n\nPossible issues:\n1. Backend is not running\n2. Wrong API URL\n3. CORS not configured\n4. Network error`,
+            "error"
+          );
+        }
       }
 
       async function testRegister() {
-          addResult('Testing registration endpoint...', 'info');
+        addResult("Testing registration endpoint...", "info");
 
-          const testUser = {
-              name: 'Test User',
-              email: `test${Date.now()}@example.com`,
-              password: 'Test123!',
-              phone: '1234567890'
-          };
+        const testUser = {
+          name: "Test User",
+          email: `test${Date.now()}@example.com`,
+          password: "Test123!",
+          phone: "1234567890",
+        };
 
-          addResult(`Sending data: ${JSON.stringify(testUser, null, 2)}`, 'info');
+        addResult(`Sending data: ${JSON.stringify(testUser, null, 2)}`, "info");
 
-          try {
-              const response = await fetch(`${API_URL}/api/auth/register`, {
-                  method: 'POST',
-                  headers: {
-                      'Content-Type': 'application/json'
-                  },
-                  body: JSON.stringify(testUser)
-              });
+        try {
+          const response = await fetch(`${API_URL}/api/auth/register`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(testUser),
+          });
 
-              const data = await response.json();
+          const data = await response.json();
 
-              if (response.ok) {
-                  addResult(`✅ Registration successful!\nStatus: ${response.status}\nResponse: ${JSON.stringify(data, null, 2)}`, 'success');
-              } else {
-                  addResult(`❌ Registration failed!\nStatus: ${response.status}\nResponse: ${JSON.stringify(data, null, 2)}`, 'error');
-              }
-          } catch (error) {
-              addResult(`❌ Registration request failed!\nError: ${error.message}`, 'error');
+          if (response.ok) {
+            addResult(
+              `✅ Registration successful!\nStatus: ${
+                response.status
+              }\nResponse: ${JSON.stringify(data, null, 2)}`,
+              "success"
+            );
+          } else {
+            addResult(
+              `❌ Registration failed!\nStatus: ${
+                response.status
+              }\nResponse: ${JSON.stringify(data, null, 2)}`,
+              "error"
+            );
           }
+        } catch (error) {
+          addResult(
+            `❌ Registration request failed!\nError: ${error.message}`,
+            "error"
+          );
+        }
       }
 
       async function testLogin() {
-          addResult('Testing login endpoint...', 'info');
+        addResult("Testing login endpoint...", "info");
 
-          const credentials = {
-              email: 'test@example.com',
-              password: 'Test123!'
-          };
+        const credentials = {
+          email: "test@example.com",
+          password: "Test123!",
+        };
 
-          addResult(`Sending credentials: ${JSON.stringify(credentials, null, 2)}`, 'info');
+        addResult(
+          `Sending credentials: ${JSON.stringify(credentials, null, 2)}`,
+          "info"
+        );
 
-          try {
-              const response = await fetch(`${API_URL}/api/auth/login`, {
-                  method: 'POST',
-                  headers: {
-                      'Content-Type': 'application/json'
-                  },
-                  body: JSON.stringify(credentials)
-              });
+        try {
+          const response = await fetch(`${API_URL}/api/auth/login`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(credentials),
+          });
 
-              const data = await response.json();
+          const data = await response.json();
 
-              if (response.ok) {
-                  addResult(`✅ Login successful!\nStatus: ${response.status}\nResponse: ${JSON.stringify(data, null, 2)}`, 'success');
-              } else {
-                  addResult(`❌ Login failed!\nStatus: ${response.status}\nResponse: ${JSON.stringify(data, null, 2)}`, 'error');
-              }
-          } catch (error) {
-              addResult(`❌ Login request failed!\nError: ${error.message}`, 'error');
+          if (response.ok) {
+            addResult(
+              `✅ Login successful!\nStatus: ${
+                response.status
+              }\nResponse: ${JSON.stringify(data, null, 2)}`,
+              "success"
+            );
+          } else {
+            addResult(
+              `❌ Login failed!\nStatus: ${
+                response.status
+              }\nResponse: ${JSON.stringify(data, null, 2)}`,
+              "error"
+            );
           }
+        } catch (error) {
+          addResult(
+            `❌ Login request failed!\nError: ${error.message}`,
+            "error"
+          );
+        }
       }
 
       // Auto-run basic connection test on load
       window.onload = () => {
-          testConnection();
+        testConnection();
       };
     </script>
   </body>
