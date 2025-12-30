@@ -52,7 +52,11 @@ const OrderHistory = () => {
     const handleOrderStatusUpdate = (data) => {
       // Only show notification if it's the current user's order
       if (data.userId === user._id) {
-        setNotification(`Order #${data.orderNumber} updated to: ${data.orderStatus.toUpperCase().replace("-", " ")}`);
+        setNotification(
+          `Order #${data.orderNumber} updated to: ${data.orderStatus
+            .toUpperCase()
+            .replace("-", " ")}`
+        );
         setTimeout(() => setNotification(""), 5000);
         fetchOrders(); // Refresh orders list
       }
@@ -60,7 +64,11 @@ const OrderHistory = () => {
 
     const handlePaymentStatusUpdate = (data) => {
       if (data.userId === user._id) {
-        setNotification(`Payment for Order #${data.orderNumber} updated to: ${data.paymentStatus.toUpperCase()}`);
+        setNotification(
+          `Payment for Order #${
+            data.orderNumber
+          } updated to: ${data.paymentStatus.toUpperCase()}`
+        );
         setTimeout(() => setNotification(""), 5000);
         fetchOrders();
       }
