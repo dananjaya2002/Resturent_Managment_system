@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { useCart } from "../context/CartContext";
 
 const API_URL = "http://localhost:5000/api";
 
@@ -9,6 +10,7 @@ const Menu = () => {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const { addToCart } = useCart();
 
   useEffect(() => {
     fetchCategories();
@@ -44,9 +46,17 @@ const Menu = () => {
     }
   };
 
-  const addToCart = (item) => {
-    // TODO: Implement cart functionality in Phase 4
-    alert(`Added ${item.name} to cart!`);
+  const handleAddToCart = (item) => {
+    addToCart(item, 1);
+    // Show a brief success message
+    const btn = event.target;
+    const originalText = btn.textContent;
+    btn.textContent = "Added! ✓";
+    btn.style.background = "#4caf50";
+    setTimeout(() => {
+      btn.textContent = originalText;
+      btn.style.background = "";
+    }, 1500);
   };
 
   return (
@@ -245,7 +255,7 @@ const Menu = () => {
                     ${item.price.toFixed(2)}
                   </span>
                   <button
-                    onClick={() => addToCart(item)}
+                    onClick={() => handleAddToCart(item)}
                     className="btn btn-primary"
                     style={{ padding: "0.5rem 1rem" }}
                   >

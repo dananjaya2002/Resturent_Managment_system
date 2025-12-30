@@ -41,15 +41,15 @@
   - [x] **Frontend**
     - [x] Build Menu Page (Public View)
     - [x] Build Admin Menu Management Dashboard
-- [ ] **Phase 4: Order Management (Core)**
-  - [ ] **Backend**
-    - [ ] Design Order Schema
-    - [ ] Implement Order Placement API
-    - [ ] Implement Order Status Update API
-  - [ ] **Frontend**
-    - [ ] Build Cart Component
-    - [ ] Build Checkout Page
-    - [ ] Build Order History/Tracking Page
+- [x] **Phase 4: Order Management (Core)**
+  - [x] **Backend**
+    - [x] Design Order Schema
+    - [x] Implement Order Placement API
+    - [x] Implement Order Status Update API
+  - [x] **Frontend**
+    - [x] Build Cart Component
+    - [x] Build Checkout Page
+    - [x] Build Order History/Tracking Page
 - [ ] **Phase 5: Real-time Communication (WebSockets)**
   - [ ] Setup Socket.IO on Backend
   - [ ] Setup Socket.IO Client

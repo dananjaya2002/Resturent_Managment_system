@@ -1,10 +1,15 @@
 import React, { useContext } from "react";
 import { Routes, Route, Link, useNavigate } from "react-router-dom";
 import { AuthProvider, AuthContext } from "./context/AuthContext";
+import { CartProvider } from "./context/CartContext";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Menu from "./pages/Menu";
 import AdminDashboard from "./pages/AdminDashboard";
+import Checkout from "./pages/Checkout";
+import OrderHistory from "./pages/OrderHistory";
+import OrderTracking from "./pages/OrderTracking";
+import Cart from "./components/Cart";
 
 // Placeholder components
 const Home = () => {
@@ -95,6 +100,7 @@ const Navigation = () => {
         <div style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
           <Link to="/">Home</Link>
           <Link to="/menu">Menu</Link>
+          {user && <Link to="/orders">My Orders</Link>}
           {user && user.role === "admin" && <Link to="/admin">Admin</Link>}
           {user ? (
             <>
@@ -132,19 +138,25 @@ const Navigation = () => {
 function App() {
   return (
     <AuthProvider>
-      <div className="app">
-        <Navigation />
+      <CartProvider>
+        <div className="app">
+          <Navigation />
+          <Cart />
 
-        <main style={{ padding: "2rem 0" }}>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/menu" element={<Menu />} />
-            <Route path="/admin" element={<AdminDashboard />} />
-          </Routes>
-        </main>
-      </div>
+          <main style={{ padding: "2rem 0" }}>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/menu" element={<Menu />} />
+              <Route path="/checkout" element={<Checkout />} />
+              <Route path="/orders" element={<OrderHistory />} />
+              <Route path="/orders/:orderId" element={<OrderTracking />} />
+              <Route path="/admin" element={<AdminDashboard />} />
+            </Routes>
+          </main>
+        </div>
+      </CartProvider>
     </AuthProvider>
   );
 }
