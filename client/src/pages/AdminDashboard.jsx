@@ -12,6 +12,7 @@ const AdminDashboard = () => {
 
   const [menuItems, setMenuItems] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -51,6 +52,7 @@ const AdminDashboard = () => {
     if (user && user.role === "admin") {
       fetchCategories();
       fetchMenuItems();
+      fetchOrders();
     }
   }, [user]);
 
@@ -79,6 +81,64 @@ const AdminDashboard = () => {
     } catch (error) {
       console.error("Failed to fetch categories:", error);
     }
+  };
+
+  const fetchOrders = async () => {
+    try {
+      setLoading(true);
+      const { data } = await axios.get(`${API_URL}/orders`, getAuthHeaders());
+      setOrders(data.orders || data);
+    } catch (err) {
+      setError("Failed to fetch orders");
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleUpdateOrderStatus = async (orderId, newStatus) => {
+    try {
+      await axios.put(
+        `${API_URL}/orders/${orderId}/status`,
+        { orderStatus: newStatus },
+        getAuthHeaders()
+      );
+      fetchOrders();
+      setError("");
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to update order status");
+    }
+  };
+
+  const handleUpdatePaymentStatus = async (orderId, newStatus) => {
+    try {
+      await axios.put(
+        `${API_URL}/orders/${orderId}/payment`,
+        { paymentStatus: newStatus },
+        getAuthHeaders()
+      );
+      fetchOrders();
+      setError("");
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to update payment status");
+    }
+  };
+
+  const getStatusColor = (status) => {
+    const colors = {
+      pending: "#ffc107",
+      confirmed: "#2196f3",
+      preparing: "#ff9800",
+      ready: "#4caf50",
+      "out-for-delivery": "#9c27b0",
+      delivered: "#4caf50",
+      cancelled: "#f44336",
+    };
+    return colors[status] || "#666";
+  };
+
+  const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleString();
   };
 
   const handleItemSubmit = async (e) => {
@@ -228,6 +288,12 @@ const AdminDashboard = () => {
       {/* Tabs */}
       <div style={{ display: "flex", gap: "1rem", marginBottom: "2rem" }}>
         <button
+          onClick={() => setActiveTab("orders")}
+          className={activeTab === "orders" ? "btn btn-primary" : "btn"}
+        >
+          Orders
+        </button>
+        <button
           onClick={() => setActiveTab("menu")}
           className={activeTab === "menu" ? "btn btn-primary" : "btn"}
         >
@@ -240,6 +306,177 @@ const AdminDashboard = () => {
           Categories
         </button>
       </div>
+
+      {/* Orders Tab */}
+      {activeTab === "orders" && (
+        <div>
+          <h2 style={{ marginBottom: "1rem" }}>Order Management</h2>
+
+          {loading ? (
+            <p>Loading orders...</p>
+          ) : (
+            <div style={{ overflowX: "auto" }}>
+              {orders.length === 0 ? (
+                <p>No orders found</p>
+              ) : (
+                orders.map((order) => (
+                  <div
+                    key={order._id}
+                    style={{
+                      background: "white",
+                      padding: "1.5rem",
+                      borderRadius: "var(--border-radius)",
+                      marginBottom: "1.5rem",
+                      boxShadow: "var(--shadow-sm)",
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        marginBottom: "1rem",
+                        paddingBottom: "1rem",
+                        borderBottom: "1px solid var(--border-color)",
+                      }}
+                    >
+                      <div>
+                        <h3 style={{ margin: "0 0 0.5rem 0" }}>
+                          Order #{order.orderNumber}
+                        </h3>
+                        <p style={{ margin: 0, color: "var(--text-secondary)" }}>
+                          {formatDate(order.createdAt)}
+                        </p>
+                        <p style={{ margin: "0.25rem 0 0 0", color: "var(--text-secondary)" }}>
+                          Customer: {order.user?.name || "N/A"}
+                        </p>
+                      </div>
+                      <div style={{ textAlign: "right" }}>
+                        <div
+                          style={{
+                            display: "inline-block",
+                            padding: "0.5rem 1rem",
+                            borderRadius: "20px",
+                            background: getStatusColor(order.orderStatus),
+                            color: "white",
+                            fontWeight: "bold",
+                            marginBottom: "0.5rem",
+                          }}
+                        >
+                          {order.orderStatus.toUpperCase().replace("-", " ")}
+                        </div>
+                        <div style={{ fontSize: "1.5rem", fontWeight: "bold", color: "var(--primary-color)" }}>
+                          ${order.totalAmount.toFixed(2)}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div style={{ marginBottom: "1rem" }}>
+                      <h4>Order Items:</h4>
+                      {order.items.map((item, index) => (
+                        <div
+                          key={index}
+                          style={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            padding: "0.5rem 0",
+                            borderBottom: "1px dashed var(--border-color)",
+                          }}
+                        >
+                          <span>
+                            {item.name} x {item.quantity}
+                          </span>
+                          <span>${item.subtotal.toFixed(2)}</span>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div style={{ marginBottom: "1rem" }}>
+                      <h4>Delivery Address:</h4>
+                      <p style={{ margin: "0.5rem 0" }}>
+                        {order.deliveryAddress.street}, {order.deliveryAddress.city},{" "}
+                        {order.deliveryAddress.postalCode}
+                      </p>
+                      <p style={{ margin: "0.5rem 0" }}>
+                        Phone: {order.deliveryAddress.phone}
+                      </p>
+                    </div>
+
+                    <div style={{ marginBottom: "1rem" }}>
+                      <strong>Payment: </strong>
+                      <span style={{ textTransform: "capitalize" }}>
+                        {order.paymentMethod} - {order.paymentStatus}
+                      </span>
+                    </div>
+
+                    <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap" }}>
+                      <div>
+                        <strong>Update Order Status:</strong>
+                        <div style={{ display: "flex", gap: "0.5rem", marginTop: "0.5rem", flexWrap: "wrap" }}>
+                          {["confirmed", "preparing", "ready", "out-for-delivery", "delivered"].map((status) => (
+                            <button
+                              key={status}
+                              onClick={() => handleUpdateOrderStatus(order._id, status)}
+                              className="btn"
+                              style={{
+                                padding: "0.5rem 1rem",
+                                fontSize: "0.875rem",
+                                background: order.orderStatus === status ? getStatusColor(status) : "#f5f5f5",
+                                color: order.orderStatus === status ? "white" : "#333",
+                                border: order.orderStatus === status ? "none" : "1px solid #ddd",
+                              }}
+                              disabled={order.orderStatus === status}
+                            >
+                              {status.replace("-", " ")}
+                            </button>
+                          ))}
+                          {order.orderStatus !== "cancelled" && order.orderStatus !== "delivered" && (
+                            <button
+                              onClick={() => handleUpdateOrderStatus(order._id, "cancelled")}
+                              className="btn"
+                              style={{
+                                padding: "0.5rem 1rem",
+                                fontSize: "0.875rem",
+                                background: "#f44336",
+                                color: "white",
+                              }}
+                            >
+                              Cancel
+                            </button>
+                          )}
+                        </div>
+                      </div>
+
+                      <div>
+                        <strong>Update Payment Status:</strong>
+                        <div style={{ display: "flex", gap: "0.5rem", marginTop: "0.5rem" }}>
+                          {["pending", "paid", "failed"].map((status) => (
+                            <button
+                              key={status}
+                              onClick={() => handleUpdatePaymentStatus(order._id, status)}
+                              className="btn"
+                              style={{
+                                padding: "0.5rem 1rem",
+                                fontSize: "0.875rem",
+                                background: order.paymentStatus === status ? "#4caf50" : "#f5f5f5",
+                                color: order.paymentStatus === status ? "white" : "#333",
+                                border: order.paymentStatus === status ? "none" : "1px solid #ddd",
+                              }}
+                              disabled={order.paymentStatus === status}
+                            >
+                              {status}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Menu Items Tab */}
       {activeTab === "menu" && (
