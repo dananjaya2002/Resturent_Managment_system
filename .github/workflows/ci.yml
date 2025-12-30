@@ -34,18 +34,11 @@ jobs:
       with:
         mongodb-version: ${{ matrix.mongodb-version }}
 
-    - name: Verify ESLint Config
-      run: |
-        echo "Checking for eslint.config.js..."
-        ls -la eslint.config.js || echo "File not found!"
-        pwd
-
     - name: Install Dependencies
       run: npm ci
 
-    # Lint step temporarily disabled due to ESLint 9 config issues in CI
-    # - name: Run Linter
-    #   run: npm run lint
+    - name: Run Linter
+      run: npm run lint
 
     - name: Run Tests
       run: npm test
