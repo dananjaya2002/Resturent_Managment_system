@@ -1,3 +1,4 @@
+// ESLint 9+ Flat Configuration
 module.exports = [
   {
     files: ["**/*.js"],
