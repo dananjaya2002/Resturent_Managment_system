@@ -19,6 +19,9 @@
   font-size: 14px;
   margin-bottom: 20px;
   transition: all 0.2s;
+  width: auto;
+  min-width: fit-content;
+  display: inline-block;
 }
 
 .back-btn:hover {
@@ -266,6 +269,9 @@
   font-size: 16px;
   cursor: pointer;
   transition: background 0.2s;
+  width: auto;
+  min-width: fit-content;
+  display: inline-block;
 }
 
 .cancel-order-btn:hover {

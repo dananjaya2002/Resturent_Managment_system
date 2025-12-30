@@ -36,6 +36,9 @@
   font-size: 16px;
   cursor: pointer;
   transition: background 0.2s;
+  width: auto;
+  min-width: fit-content;
+  display: inline-block;
 }
 
 .checkout-empty button:hover {
@@ -202,6 +205,8 @@
   cursor: pointer;
   transition: all 0.2s;
   border: none;
+  min-width: fit-content;
+  width: auto;
 }
 
 .btn-primary {

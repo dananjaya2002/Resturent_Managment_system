@@ -28,6 +28,9 @@
   cursor: pointer;
   font-size: 14px;
   transition: all 0.2s;
+  width: auto;
+  min-width: fit-content;
+  display: inline-block;
 }
 
 .filter-btn:hover {
@@ -78,6 +81,9 @@
   font-size: 16px;
   cursor: pointer;
   transition: background 0.2s;
+  width: auto;
+  min-width: fit-content;
+  display: inline-block;
 }
 
 .no-orders button:hover {
@@ -194,6 +200,9 @@
   cursor: pointer;
   font-size: 14px;
   transition: background 0.2s;
+  width: auto;
+  min-width: fit-content;
+  display: inline-block;
 }
 
 .view-details-btn:hover {
