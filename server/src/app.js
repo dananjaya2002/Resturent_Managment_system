@@ -8,13 +8,13 @@ const app = express();
 // Middleware
 app.use(express.json());
 
-// CORS configuration - allow all origins for development
-app.use(
-  cors({
-    origin: true, // Allow all origins
-    credentials: true,
-  })
-);
+// CORS configuration - allow all origins
+app.use(cors({
+  origin: '*', // Allow all origins explicitly
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
 // Serve static files for images
 app.use("/images", express.static(path.join(__dirname, "../public/images")));
