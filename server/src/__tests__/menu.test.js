@@ -1,5 +1,4 @@
 const request = require("supertest");
-const mongoose = require("mongoose");
 const app = require("../app");
 const Category = require("../models/Category");
 const MenuItem = require("../models/MenuItem");

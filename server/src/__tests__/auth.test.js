@@ -1,7 +1,6 @@
 const request = require('supertest');
 const app = require('../app');
 const User = require('../models/User');
-const mongoose = require('mongoose');
 
 // Mock specific DB operations for User
 jest.mock('../models/User');
