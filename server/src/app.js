@@ -5,16 +5,16 @@ const path = require("path");
 
 const app = express();
 
-// Middleware
-app.use(express.json());
-
-// CORS configuration - allow all origins
+// CORS MUST be first - allow all origins
 app.use(cors({
-  origin: '*', // Allow all origins explicitly
+  origin: '*',
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
+
+// Middleware
+app.use(express.json());
 
 // Serve static files for images
 app.use("/images", express.static(path.join(__dirname, "../public/images")));
