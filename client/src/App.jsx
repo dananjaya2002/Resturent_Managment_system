@@ -3,6 +3,7 @@ import { Routes, Route, Link, useNavigate } from "react-router-dom";
 import { AuthProvider, AuthContext } from "./context/AuthContext";
 import { CartProvider } from "./context/CartContext";
 import { SocketProvider } from "./context/SocketContext";
+import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Menu from "./pages/Menu";
@@ -11,56 +12,6 @@ import Checkout from "./pages/Checkout";
 import OrderHistory from "./pages/OrderHistory";
 import OrderTracking from "./pages/OrderTracking";
 import Cart from "./components/Cart";
-
-// Placeholder components
-const Home = () => {
-  const { user, logout } = useContext(AuthContext);
-  return (
-    <div
-      className="container"
-      style={{ textAlign: "center", marginTop: "4rem" }}
-    >
-      <h1
-        style={{
-          fontSize: "3rem",
-          marginBottom: "1rem",
-          color: "var(--primary-color)",
-        }}
-      >
-        Delicious Food, <br /> Delivered To You
-      </h1>
-      {user ? (
-        <>
-          <p style={{ fontSize: "1.5rem", marginBottom: "2rem" }}>
-            Welcome back, {user.name} ({user.role})!
-          </p>
-          <button
-            onClick={logout}
-            className="btn"
-            style={{ border: "1px solid #ccc" }}
-          >
-            Logout
-          </button>
-        </>
-      ) : (
-        <>
-          <p
-            style={{
-              fontSize: "1.2rem",
-              color: "var(--text-secondary)",
-              marginBottom: "2rem",
-            }}
-          >
-            Order your favorite meals from the best restaurants.
-          </p>
-          <Link to="/login" className="btn btn-primary">
-            Order Now
-          </Link>
-        </>
-      )}
-    </div>
-  );
-};
 
 const Navigation = () => {
   const { user, logout } = useContext(AuthContext);
@@ -145,7 +96,7 @@ function App() {
             <Navigation />
             <Cart />
 
-            <main style={{ padding: "2rem 0" }}>
+            <main>
               <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/login" element={<Login />} />

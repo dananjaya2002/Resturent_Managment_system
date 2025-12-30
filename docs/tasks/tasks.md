@@ -54,7 +54,7 @@
   - [x] Setup Socket.IO on Backend
   - [x] Setup Socket.IO Client
   - [x] Implement Real-time Order Status Updates
-- [ ] **Phase 6: Testing & Finishing Touches**
-  - [ ] Unit Testing (Jest)
-  - [ ] Integration Testing
-  - [ ] UI Polish & Responsive Checks
+- [x] **Phase 6: Testing & Finishing Touches**
+  - [x] Unit Testing (Jest)
+  - [x] Integration Testing
+  - [x] UI Polish & Responsive Checks
