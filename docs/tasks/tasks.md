@@ -1,0 +1,60 @@
+# Task List: Restaurant / Takeaway Ordering System
+
+- [ ] **Phase 1: Project Initialization & Architecture**
+  - [ ] Initialize Git repository
+  - [ ] Create project structure (`client` and `server` directories)
+  - [x] **Backend Setup**
+    - [x] Initialize Node.js project ([package.json](file:///c:/xampp/htdocs/resturent_mng_sys/package.json))
+    - [x] Install dependencies (express, mongoose, dotenv, cors, etc.)
+    - [x] Setup Express server entry point ([server.js](file:///c:/xampp/htdocs/resturent_mng_sys/server/src/server.js) or `index.js`)
+    - [x] Config MongoDB connection
+    - [x] Setup basic error handling middleware
+  - [x] **Frontend Setup**
+    - [x] Initialize React app (Vite)
+    - [x] Setup Design System (Global CSS, Variables, Typography)
+    - [x] Install dependencies (react-router-dom, axios/fetch, etc.)
+    - [x] Setup Project Folder Structure (components, pages, context, etc.)
+- [x] **Phase 1.5: DevOps & Testing Setup**
+  - [x] Create GitHub Actions Workflow ([.github/workflows/ci.yml](file:///c:/xampp/htdocs/resturent_mng_sys/.github/workflows/ci.yml))
+  - [x] **Server Testing Setup**
+    - [x] Install Jest & Supertest
+    - [x] Create [jest.config.js](file:///c:/xampp/htdocs/resturent_mng_sys/server/jest.config.js)
+    - [x] Add basic sample test
+  - [x] **Static Analysis**
+    - [x] Setup ESLint for Server
+- [x] **Phase 2: Authentication & User Management**
+  - [x] **Backend**
+    - [x] Design User Schema (MongoDB)
+    - [x] Implement Register API (JWT generation)
+    - [x] Implement Login API
+    - [x] Implement Auth Middleware (JWT verification)
+  - [x] **Frontend**
+    - [x] Create Auth Context/Provider
+    - [x] Build Login Page
+    - [x] Build Register Page
+    - [x] Build Profile/Dashboard specific to roles
+- [x] **Phase 3: Menu Management**
+  - [x] **Backend**
+    - [x] Design MenuItem and Category Schemas
+    - [x] Implement CRUD APIs for Categories
+    - [x] Implement CRUD APIs for MenuItems
+  - [x] **Frontend**
+    - [x] Build Menu Page (Public View)
+    - [x] Build Admin Menu Management Dashboard
+- [ ] **Phase 4: Order Management (Core)**
+  - [ ] **Backend**
+    - [ ] Design Order Schema
+    - [ ] Implement Order Placement API
+    - [ ] Implement Order Status Update API
+  - [ ] **Frontend**
+    - [ ] Build Cart Component
+    - [ ] Build Checkout Page
+    - [ ] Build Order History/Tracking Page
+- [ ] **Phase 5: Real-time Communication (WebSockets)**
+  - [ ] Setup Socket.IO on Backend
+  - [ ] Setup Socket.IO Client
+  - [ ] Implement Real-time Order Status Updates
+- [ ] **Phase 6: Testing & Finishing Touches**
+  - [ ] Unit Testing (Jest)
+  - [ ] Integration Testing
+  - [ ] UI Polish & Responsive Checks

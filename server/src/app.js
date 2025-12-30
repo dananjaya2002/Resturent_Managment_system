@@ -1,36 +1,47 @@
-const express = require('express');
-const cors = require('cors');
-const morgan = require('morgan');
+const express = require("express");
+const cors = require("cors");
+const morgan = require("morgan");
+const path = require("path");
 
 const app = express();
 
 // Middleware
 app.use(express.json());
-app.use(cors({
-    origin: process.env.CLIENT_URL || 'http://localhost:5173',
-    credentials: true
-}));
+app.use(
+  cors({
+    origin: process.env.CLIENT_URL || "http://localhost:5173",
+    credentials: true,
+  })
+);
 
-if (process.env.NODE_ENV === 'development') {
-    app.use(morgan('dev'));
+// Serve static files for images
+app.use("/images", express.static(path.join(__dirname, "../public/images")));
+
+if (process.env.NODE_ENV === "development") {
+  app.use(morgan("dev"));
 }
 
 // Routes
-const authRoutes = require('./routes/authRoutes');
-app.use('/api/auth', authRoutes);
+const authRoutes = require("./routes/authRoutes");
+const categoryRoutes = require("./routes/categoryRoutes");
+const menuRoutes = require("./routes/menuRoutes");
 
-app.get('/', (req, res) => {
-    res.send('Restaurant Ordering System API is running...');
+app.use("/api/auth", authRoutes);
+app.use("/api/categories", categoryRoutes);
+app.use("/api/menu", menuRoutes);
+
+app.get("/", (req, res) => {
+  res.send("Restaurant Ordering System API is running...");
 });
 
 // Error Handling Middleware
 app.use((err, req, res, next) => {
-    const statusCode = res.statusCode === 200 ? 500 : res.statusCode;
-    res.status(statusCode);
-    res.json({
-        message: err.message,
-        stack: process.env.NODE_ENV === 'production' ? null : err.stack,
-    });
+  const statusCode = res.statusCode === 200 ? 500 : res.statusCode;
+  res.status(statusCode);
+  res.json({
+    message: err.message,
+    stack: process.env.NODE_ENV === "production" ? null : err.stack,
+  });
 });
 
 module.exports = app;
