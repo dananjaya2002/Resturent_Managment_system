@@ -8,7 +8,7 @@ const app = express();
 // Middleware
 app.use(express.json());
 
-// CORS configuration - allow multiple origins
+// CORS configuration - allow multiple origins for development and production
 const allowedOrigins = [
   'http://localhost:5173',
   'http://localhost:3000',
