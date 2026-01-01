@@ -17,9 +17,9 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [token, setToken] = useState(localStorage.getItem("token"));
 
-  // Configure axios base URL - ideally from env
+  // Configure axios base URL
   const api = axios.create({
-    baseURL: "http://localhost:5000/api",
+    baseURL: import.meta.env.VITE_API_URL || "http://localhost:5000/api",
   });
 
   // Attach token to requests if it exists

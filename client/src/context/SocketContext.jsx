@@ -18,7 +18,10 @@ export const SocketProvider = ({ children }) => {
 
   // Use lazy initialization to create socket only once
   const [socket] = useState(() => {
-    const socketInstance = io("http://localhost:5000", {
+    // Determine the base URL: remove '/api' if present for socket connection
+    const baseUrl = (import.meta.env.VITE_API_URL || "http://localhost:5000").replace('/api', '');
+
+    const socketInstance = io(baseUrl, {
       transports: ["websocket", "polling"],
       reconnection: true,
       reconnectionDelay: 1000,
