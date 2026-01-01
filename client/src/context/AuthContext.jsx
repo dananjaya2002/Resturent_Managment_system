@@ -18,8 +18,11 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(localStorage.getItem("token"));
 
   // Configure axios base URL
+  const envApiUrl = import.meta.env.VITE_API_URL;
+  console.log("DEBUG: AuthContext VITE_API_URL:", envApiUrl);
+
   const api = axios.create({
-    baseURL: import.meta.env.VITE_API_URL || "http://localhost:5000/api",
+    baseURL: envApiUrl || "http://localhost:5000/api",
   });
 
   // Attach token to requests if it exists
