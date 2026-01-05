@@ -1,7 +1,7 @@
 /* Cart Icon Button */
 .cart-icon-btn {
   position: fixed;
-  top: 20px;
+  bottom: 20px;
   right: 20px;
   background: #ff6b35;
   color: white;
@@ -76,6 +76,7 @@
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -85,6 +86,7 @@
   from {
     transform: translateX(100%);
   }
+
   to {
     transform: translateX(0);
   }

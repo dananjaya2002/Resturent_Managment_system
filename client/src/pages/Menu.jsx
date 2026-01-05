@@ -236,11 +236,12 @@ const Menu = () => {
                 </div>
 
                 {/* Price and Add to Cart */}
+                {/* Price and Add to Cart */}
                 <div
                   style={{
                     display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
+                    flexDirection: "column",
+                    gap: "1rem",
                     marginTop: "1rem",
                   }}
                 >
@@ -249,6 +250,7 @@ const Menu = () => {
                       fontSize: "1.5rem",
                       fontWeight: "bold",
                       color: "var(--primary-color)",
+                      alignSelf: "flex-start",
                     }}
                   >
                     ${item.price.toFixed(2)}
@@ -256,7 +258,7 @@ const Menu = () => {
                   <button
                     onClick={() => handleAddToCart(item)}
                     className="btn btn-primary"
-                    style={{ padding: "0.5rem 1rem" }}
+                    style={{ padding: "0.5rem 1rem", width: "100%" }}
                   >
                     Add to Cart
                   </button>
