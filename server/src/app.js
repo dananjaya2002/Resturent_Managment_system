@@ -41,7 +41,15 @@ app.get("/", (req, res) => {
 });
 
 // Error Handling Middleware
-app.use((err, req, res) => {
+// 404 Handler - MUST be before error handler
+app.use((req, res, next) => {
+  const error = new Error(`Not Found - ${req.originalUrl}`);
+  res.status(404);
+  next(error);
+});
+
+// Error Handling Middleware
+app.use((err, req, res, next) => {
   const statusCode = res.statusCode === 200 ? 500 : res.statusCode;
   res.status(statusCode);
   res.json({
