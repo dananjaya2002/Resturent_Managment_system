@@ -7,7 +7,12 @@
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
     "test": "jest",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "seed:users": "node src/seedUsers.js",
+    "seed:tables": "node src/seedTables.js",
+    "seed:data": "node src/seedData.js",
+    "seed:production": "node src/seedProduction.js",
+    "seed:all": "node src/seedProduction.js"
   },
   "keywords": [],
   "author": "",

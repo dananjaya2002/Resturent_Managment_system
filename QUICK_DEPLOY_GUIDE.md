@@ -9,9 +9,11 @@
 3. Click **Settings** → **Environment Variables**
 4. Add this variable:
    - **Key:** `VITE_API_URL`
-   - **Value:** `https://resturentmanagmentsystem-production.up.railway.app`
+   - **Value:** `https://resturentmanagmentsystem-production.up.railway.app/api`
    - **Environments:** Check all (Production, Preview, Development)
 5. Click **Save**
+
+**⚠️ IMPORTANT:** The URL must end with `/api`
 
 ### Step 2: Redeploy 🚀
 
