@@ -3,6 +3,7 @@
 ## Overview
 
 This guide will help you populate your **Railway production database** with demo data including:
+
 - 👥 **7 Demo Users** (Admin, Owner, Manager, Chef, Waiter, Cashier, Customer)
 - 📁 **5 Categories** (Appetizers, Main Course, Desserts, Beverages, Salads)
 - 🍽️ **23 Menu Items** across all categories
@@ -34,6 +35,7 @@ PORT=5000
 ```
 
 **Important:** Get your MongoDB connection string from:
+
 - Railway Dashboard → Your MongoDB Service → Variables → `MONGO_URL`
 
 #### Step 3: Run the Seeding Script
@@ -49,6 +51,7 @@ npm run seed:data
 ```
 
 **For production specifically, use:**
+
 ```bash
 node src/seedProduction.js
 ```
@@ -85,15 +88,15 @@ railway run node src/seedProduction.js
 
 ### 👥 Demo Users
 
-| Role | Email | Password | Access Level |
-|------|-------|----------|-------------|
-| **Admin** | admin@resto.com | admin123 | Full system access |
-| **Owner** | owner@resto.com | owner123 | Business management + stats |
-| **Manager** | manager@resto.com | manager123 | Operations + reporting |
-| **Chef** | chef@resto.com | chef123 | Kitchen orders |
-| **Waiter** | waiter@resto.com | waiter123 | Table + order management |
-| **Cashier** | cashier@resto.com | cashier123 | Billing + POS |
-| **Customer** | customer@resto.com | customer123 | Menu browsing + ordering |
+| Role         | Email              | Password    | Access Level                |
+| ------------ | ------------------ | ----------- | --------------------------- |
+| **Admin**    | admin@resto.com    | admin123    | Full system access          |
+| **Owner**    | owner@resto.com    | owner123    | Business management + stats |
+| **Manager**  | manager@resto.com  | manager123  | Operations + reporting      |
+| **Chef**     | chef@resto.com     | chef123     | Kitchen orders              |
+| **Waiter**   | waiter@resto.com   | waiter123   | Table + order management    |
+| **Cashier**  | cashier@resto.com  | cashier123  | Billing + POS               |
+| **Customer** | customer@resto.com | customer123 | Menu browsing + ordering    |
 
 ### 📁 Categories
 
@@ -106,12 +109,14 @@ railway run node src/seedProduction.js
 ### 🍽️ Menu Items (23 items)
 
 **Appetizers ($4.99 - $8.99)**
+
 - Spring Rolls
 - Chicken Wings
 - Garlic Bread
 - Mozzarella Sticks
 
 **Main Course ($11.99 - $18.99)**
+
 - Grilled Chicken
 - Beef Burger
 - Pasta Carbonara
@@ -120,18 +125,21 @@ railway run node src/seedProduction.js
 - Pizza Margherita
 
 **Desserts ($5.99 - $7.99)**
+
 - Chocolate Cake
 - Ice Cream Sundae
 - Tiramisu
 - Apple Pie
 
 **Beverages ($2.99 - $4.99)**
+
 - Coca Cola
 - Fresh Orange Juice
 - Coffee
 - Iced Tea
 
 **Salads ($7.99 - $9.99)**
+
 - Caesar Salad
 - Greek Salad
 - Garden Salad
@@ -226,7 +234,7 @@ The seeding script is **safe** and **idempotent**:
 ✅ **Checks for existing data** - Won't create duplicates  
 ✅ **Non-destructive** - Doesn't delete existing data  
 ✅ **Can run multiple times** - Will skip items that already exist  
-✅ **Detailed logging** - Shows what was created vs. what already exists  
+✅ **Detailed logging** - Shows what was created vs. what already exists
 
 ### Example Output:
 
@@ -265,6 +273,7 @@ The seeding script is **safe** and **idempotent**:
 ### Issue: "MONGO_URI not found"
 
 **Solution:**
+
 - Make sure `.env` file exists in `server/` directory
 - Verify `MONGO_URI` is set in the file
 - Check there are no spaces around the `=` sign
@@ -272,6 +281,7 @@ The seeding script is **safe** and **idempotent**:
 ### Issue: "Connection timeout"
 
 **Solution:**
+
 - Check MongoDB Atlas IP Whitelist
 - Go to MongoDB Atlas → Network Access
 - Add IP `0.0.0.0/0` to allow connections from anywhere
@@ -280,6 +290,7 @@ The seeding script is **safe** and **idempotent**:
 ### Issue: "Users already exist"
 
 **Solution:**
+
 - This is normal! The script detects existing data
 - It will show "⚠️ Already exists" for items that are already in the database
 - No duplicates will be created
@@ -287,6 +298,7 @@ The seeding script is **safe** and **idempotent**:
 ### Issue: "Authentication failed"
 
 **Solution:**
+
 - Verify your MongoDB connection string is correct
 - Check username and password in the connection string
 - Ensure the database user has read/write permissions
@@ -316,23 +328,24 @@ If you want to **clear all data and start fresh**:
 Create a new file `server/src/resetDatabase.js`:
 
 ```javascript
-const mongoose = require('mongoose');
-require('dotenv').config();
+const mongoose = require("mongoose");
+require("dotenv").config();
 
 const resetDatabase = async () => {
-    await mongoose.connect(process.env.MONGO_URI);
-    
-    // Drop all collections
-    await mongoose.connection.db.dropDatabase();
-    
-    console.log('✅ Database reset complete!');
-    process.exit(0);
+  await mongoose.connect(process.env.MONGO_URI);
+
+  // Drop all collections
+  await mongoose.connection.db.dropDatabase();
+
+  console.log("✅ Database reset complete!");
+  process.exit(0);
 };
 
 resetDatabase();
 ```
 
 Then run:
+
 ```bash
 node src/resetDatabase.js
 npm run seed:production
@@ -362,21 +375,25 @@ npm run seed:all        # Same as seed:production
 ## 🎯 Next Steps After Seeding
 
 1. **Test All User Roles:**
+
    - Login as each user type
    - Verify role-based access works
    - Check dashboards display correctly
 
 2. **Test Menu:**
+
    - Browse menu as customer
    - Add items to cart
    - Complete checkout
 
 3. **Test Orders:**
+
    - Place orders as customer
    - View orders in chef kitchen display
    - Process orders through workflow
 
 4. **Test Staff Features:**
+
    - Waiter: Manage tables
    - Cashier: Process payments
    - Manager: View statistics
@@ -391,6 +408,7 @@ npm run seed:all        # Same as seed:production
 ## 🎉 Success!
 
 Once seeding is complete, your production database will have:
+
 - ✅ 7 test users for all roles
 - ✅ Full menu with 23 items
 - ✅ 10 restaurant tables

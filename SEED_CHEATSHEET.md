@@ -11,7 +11,7 @@ npm run seed:production
 
 ✅ **7 Demo Users** for testing all roles  
 ✅ **23 Menu Items** across 5 categories  
-✅ **10 Restaurant Tables** ready to use  
+✅ **10 Restaurant Tables** ready to use
 
 ---
 
@@ -20,10 +20,12 @@ npm run seed:production
 After seeding, use these credentials on your live site:
 
 **🔴 Admin Access:**
+
 - Email: `admin@resto.com`
 - Password: `admin123`
 
 **🟢 Staff Accounts:**
+
 - Owner: `owner@resto.com` / `owner123`
 - Manager: `manager@resto.com` / `manager123`
 - Waiter: `waiter@resto.com` / `waiter123`
@@ -31,6 +33,7 @@ After seeding, use these credentials on your live site:
 - Cashier: `cashier@resto.com` / `cashier123`
 
 **🔵 Customer Account:**
+
 - Email: `customer@resto.com`
 - Password: `customer123`
 
@@ -66,6 +69,7 @@ npm run seed:production
 ## 📱 What Gets Added:
 
 ### Menu Items (23 total):
+
 - 🥟 4 Appetizers ($4.99-$8.99)
 - 🍗 6 Main Courses ($11.99-$18.99)
 - 🍰 4 Desserts ($5.99-$7.99)
@@ -73,6 +77,7 @@ npm run seed:production
 - 🥗 3 Salads ($7.99-$9.99)
 
 ### Tables (10 total):
+
 - 4 tables for 2 people
 - 4 tables for 4 people
 - 1 table for 6 people
