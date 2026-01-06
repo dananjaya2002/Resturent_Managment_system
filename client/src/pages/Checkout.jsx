@@ -52,7 +52,7 @@ const Checkout = () => {
         paymentMethod: formData.paymentMethod,
       };
 
-      if (formData.orderType === 'dine-in') {
+      if (formData.orderType === "dine-in") {
         orderData.tableNumber = parseInt(formData.tableNumber);
       } else {
         orderData.deliveryAddress = {
@@ -64,15 +64,11 @@ const Checkout = () => {
         };
       }
 
-      const response = await axios.post(
-        `${API_URL}/orders`,
-        orderData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await axios.post(`${API_URL}/orders`, orderData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       // Clear cart and redirect to order tracking
       clearCart();
@@ -142,23 +138,41 @@ const Checkout = () => {
           <form onSubmit={handleSubmit}>
             <div className="form-group">
               <label>Order Type</label>
-              <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
-                <label className="radio-label" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
+              <div
+                style={{ display: "flex", gap: "1rem", marginBottom: "1rem" }}
+              >
+                <label
+                  className="radio-label"
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.5rem",
+                    cursor: "pointer",
+                  }}
+                >
                   <input
                     type="radio"
                     name="orderType"
                     value="delivery"
-                    checked={formData.orderType === 'delivery'}
+                    checked={formData.orderType === "delivery"}
                     onChange={handleChange}
                   />
                   Delivery
                 </label>
-                <label className="radio-label" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
+                <label
+                  className="radio-label"
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.5rem",
+                    cursor: "pointer",
+                  }}
+                >
                   <input
                     type="radio"
                     name="orderType"
                     value="dine-in"
-                    checked={formData.orderType === 'dine-in'}
+                    checked={formData.orderType === "dine-in"}
                     onChange={handleChange}
                   />
                   Dine-in
@@ -166,7 +180,7 @@ const Checkout = () => {
               </div>
             </div>
 
-            {formData.orderType === 'dine-in' ? (
+            {formData.orderType === "dine-in" ? (
               <div className="form-group">
                 <label htmlFor="tableNumber">Table Number *</label>
                 <input

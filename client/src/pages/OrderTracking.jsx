@@ -21,14 +21,11 @@ const OrderTracking = () => {
       setLoading(true);
       const token = localStorage.getItem("token");
 
-      const response = await axios.get(
-        `${API_URL}/orders/${orderId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await axios.get(`${API_URL}/orders/${orderId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       setOrder(response.data);
       setError("");

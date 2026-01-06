@@ -3,26 +3,32 @@
 ## ✅ What Has Been Done
 
 ### 1. **API Configuration Centralization**
+
 Created a centralized API configuration file that uses environment variables:
 
 **File:** `client/src/config/api.js`
+
 ```javascript
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 export const API_URL = `${API_BASE_URL}/api`;
 ```
 
 ### 2. **Production Environment Variables**
+
 Created `.env.production` file with your Railway backend URL:
 
 **File:** `client/.env.production`
+
 ```
 VITE_API_URL=https://resturentmanagmentsystem-production.up.railway.app
 ```
 
 ### 3. **Updated All API Calls**
+
 Migrated **17 files** from hardcoded `http://localhost:5000` to use centralized config:
 
 ✅ **Pages Updated:**
+
 - `Menu.jsx` - Customer menu browsing
 - `Settings.jsx` - User profile updates
 - `Checkout.jsx` - Order placement
@@ -31,6 +37,7 @@ Migrated **17 files** from hardcoded `http://localhost:5000` to use centralized 
 - `AdminDashboard.jsx` - Admin management panel
 
 ✅ **Dashboard Components:**
+
 - `waiter/TableAllocation.jsx` - Table management
 - `waiter/OrderTrackingList.jsx` - Order tracking for waiters
 - `owner/OwnerDashboard.jsx` - Employee management
@@ -41,9 +48,11 @@ Migrated **17 files** from hardcoded `http://localhost:5000` to use centralized 
 - `cashier/Billing.jsx` - Billing and payments
 
 ✅ **Components:**
+
 - `components/Cart.jsx` - Shopping cart with image URLs
 
 ✅ **Context Files:**
+
 - `context/AuthContext.jsx` - Already using environment variables ✓
 - `context/SocketContext.jsx` - Already using environment variables ✓
 
@@ -61,10 +70,12 @@ Migrated **17 files** from hardcoded `http://localhost:5000` to use centralized 
 ### Option 1: Through Vercel Dashboard (Recommended)
 
 1. **Go to your Vercel project settings:**
+
    - Visit: https://vercel.com/dashboard
    - Select your project: `resturent-managment-system`
 
 2. **Add Environment Variable:**
+
    - Go to **Settings** → **Environment Variables**
    - Add new variable:
      - **Name:** `VITE_API_URL`
@@ -98,14 +109,17 @@ Vercel will automatically deploy with the new changes and environment variables.
 Your project now supports different environments:
 
 ### Development (Local)
+
 - Uses: `http://localhost:5000`
 - Auto-detects when `VITE_API_URL` is not set
 
 ### Production (Vercel)
+
 - Uses: `https://resturentmanagmentsystem-production.up.railway.app`
 - Set via `.env.production` or Vercel environment variables
 
 ### Testing/Preview
+
 - Can be configured separately in Vercel settings
 - Use preview environment variables for staging
 
@@ -116,11 +130,13 @@ Your project now supports different environments:
 After deployment, verify these features work:
 
 ### Authentication & User Management
+
 - [ ] User login/register
 - [ ] Profile settings update
 - [ ] Role-based access (owner, manager, waiter, chef, cashier)
 
 ### Customer Features
+
 - [ ] Browse menu with images
 - [ ] Add items to cart
 - [ ] Checkout and place orders
@@ -128,6 +144,7 @@ After deployment, verify these features work:
 - [ ] Track order status
 
 ### Staff Dashboards
+
 - [ ] Waiter: Table allocation and order tracking
 - [ ] Chef: Kitchen display for order preparation
 - [ ] Cashier: POS system and billing
@@ -135,11 +152,13 @@ After deployment, verify these features work:
 - [ ] Owner: Employee management
 
 ### Real-time Features
+
 - [ ] Live order updates (Socket.io)
 - [ ] Real-time status changes
 - [ ] Notifications for new orders
 
 ### Admin Features
+
 - [ ] Menu management
 - [ ] Category management
 - [ ] Inventory tracking
@@ -152,11 +171,14 @@ After deployment, verify these features work:
 ### Issue: "Network Error" or "Cannot connect to server"
 
 **Solution:**
+
 1. Check if Railway backend is running:
+
    - Visit: https://resturentmanagmentsystem-production.up.railway.app/api
    - Should return API response or status
 
 2. Verify environment variable in Vercel:
+
    - Go to Vercel project settings
    - Check `VITE_API_URL` is set correctly
    - Redeploy after adding/changing environment variables
@@ -169,6 +191,7 @@ After deployment, verify these features work:
 ### Issue: Images not loading
 
 **Solution:**
+
 - Images now use: `${API_URL.replace('/api', '')}/images/...`
 - Verify your Railway backend serves images from `/images` route
 - Check if images exist in `server/public/images/` directory
@@ -176,6 +199,7 @@ After deployment, verify these features work:
 ### Issue: Socket.io not connecting
 
 **Solution:**
+
 - Socket connects to base URL without `/api`
 - Already configured in `SocketContext.jsx`
 - Check Railway logs for WebSocket connection attempts
@@ -197,18 +221,21 @@ Ensure your Railway backend allows requests from Vercel domain:
 
 ```javascript
 // server/src/app.js or server.js
-app.use(cors({
-  origin: [
-    'http://localhost:5173',
-    'https://resturent-managment-system-nu.vercel.app'
-  ],
-  credentials: true
-}));
+app.use(
+  cors({
+    origin: [
+      "http://localhost:5173",
+      "https://resturent-managment-system-nu.vercel.app",
+    ],
+    credentials: true,
+  })
+);
 ```
 
 ### API Routes
 
 All API routes now automatically use:
+
 - **Development:** `http://localhost:5000/api/...`
 - **Production:** `https://resturentmanagmentsystem-production.up.railway.app/api/...`
 
@@ -221,9 +248,10 @@ All API routes now automatically use:
 ✅ **No hardcoded URLs** remain (except fallbacks)  
 ✅ **Ready for Vercel deployment**  
 ✅ **Railway backend** already running  
-✅ **Zero errors** in codebase  
+✅ **Zero errors** in codebase
 
 ### Next Step:
+
 **→ Add `VITE_API_URL` environment variable in Vercel dashboard and redeploy!**
 
 ---
@@ -231,6 +259,7 @@ All API routes now automatically use:
 ## 🆘 Need Help?
 
 If you encounter issues:
+
 1. Check Vercel deployment logs
 2. Check Railway backend logs
 3. Verify CORS settings on backend

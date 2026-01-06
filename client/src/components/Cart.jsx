@@ -72,7 +72,9 @@ const Cart = () => {
                         <div className="cart-item-image">
                           {item.imageUrl ? (
                             <img
-                              src={`${API_URL.replace('/api', '')}${item.imageUrl}`}
+                              src={`${API_URL.replace("/api", "")}${
+                                item.imageUrl
+                              }`}
                               alt={item.name}
                             />
                           ) : (
