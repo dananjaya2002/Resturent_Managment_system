@@ -9,13 +9,13 @@ const {
   cancelOrder,
   getOrderStats,
 } = require("../controllers/orderController");
-const { protect, admin } = require("../middleware/authMiddleware");
+const { protect, authorize } = require("../middleware/authMiddleware");
 
 // All routes require authentication
 router.use(protect);
 
-// Get order statistics (admin only) - must be before /:id route
-router.get("/stats", admin, getOrderStats);
+// Get order statistics (admin, manager, owner)
+router.get("/stats", authorize('admin', 'manager', 'owner'), getOrderStats);
 
 // Create new order and get all orders
 router.route("/").post(createOrder).get(getOrders);
@@ -23,10 +23,10 @@ router.route("/").post(createOrder).get(getOrders);
 // Get, update, cancel specific order
 router.route("/:id").get(getOrderById).delete(cancelOrder);
 
-// Update order status (admin only)
-router.put("/:id/status", admin, updateOrderStatus);
+// Update order status (waiter, chef, admin, manager, owner)
+router.put("/:id/status", authorize('admin', 'manager', 'owner', 'chef', 'waiter'), updateOrderStatus);
 
-// Update payment status (admin only)
-router.put("/:id/payment", admin, updatePaymentStatus);
+// Update payment status (cashier, admin, manager, owner)
+router.put("/:id/payment", authorize('admin', 'manager', 'owner', 'cashier'), updatePaymentStatus);
 
 module.exports = router;

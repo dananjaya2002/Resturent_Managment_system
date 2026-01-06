@@ -3,6 +3,7 @@ const http = require('http');
 const { Server } = require('socket.io');
 const app = require('./app');
 const connectDB = require('./config/db');
+const tableRoutes = require('./routes/tableRoutes');
 
 // Connect to Database
 connectDB();

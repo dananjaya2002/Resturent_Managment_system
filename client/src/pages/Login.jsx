@@ -13,7 +13,28 @@ const Login = () => {
         setError('');
         const res = await login(formData.email, formData.password);
         if (res.success) {
-            navigate('/'); // Redirect to dashboard/home
+            switch (res.role) {
+                case 'admin':
+                    navigate('/admin');
+                    break;
+                case 'waiter':
+                    navigate('/waiter');
+                    break;
+                case 'chef':
+                    navigate('/chef');
+                    break;
+                case 'cashier':
+                    navigate('/cashier');
+                    break;
+                case 'manager':
+                    navigate('/manager');
+                    break;
+                case 'owner':
+                    navigate('/owner');
+                    break;
+                default:
+                    navigate('/'); // Customer or others go to home
+            }
         } else {
             setError(res.message);
         }

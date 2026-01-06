@@ -6,24 +6,31 @@ const MenuItem = require("../models/MenuItem");
 // @access  Private
 const createOrder = async (req, res) => {
   try {
-    const { items, deliveryAddress, orderNotes, paymentMethod } = req.body;
+    const { items, deliveryAddress, orderNotes, paymentMethod, orderType, tableNumber } = req.body;
 
     // Validate items array
     if (!items || items.length === 0) {
       return res.status(400).json({ message: "No order items provided" });
     }
 
-    // Validate delivery address
-    if (
-      !deliveryAddress ||
-      !deliveryAddress.street ||
-      !deliveryAddress.city ||
-      !deliveryAddress.postalCode ||
-      !deliveryAddress.phone
-    ) {
-      return res
-        .status(400)
-        .json({ message: "Complete delivery address is required" });
+    // Validate based on order type
+    if (orderType === 'dine-in') {
+      if (!tableNumber) {
+        return res.status(400).json({ message: "Table number is required for dine-in orders" });
+      }
+    } else {
+      // Default to delivery validation
+      if (
+        !deliveryAddress ||
+        !deliveryAddress.street ||
+        !deliveryAddress.city ||
+        !deliveryAddress.postalCode ||
+        !deliveryAddress.phone
+      ) {
+        return res
+          .status(400)
+          .json({ message: "Complete delivery address is required" });
+      }
     }
 
     // Process order items and calculate total
@@ -66,10 +73,12 @@ const createOrder = async (req, res) => {
       user: req.user._id,
       items: orderItems,
       totalAmount,
-      deliveryAddress,
+      deliveryAddress: orderType === 'delivery' ? deliveryAddress : undefined,
       orderNotes,
       paymentMethod: paymentMethod || "cash",
       estimatedDeliveryTime,
+      orderType: orderType || 'delivery',
+      tableNumber
     });
 
     // Populate order details

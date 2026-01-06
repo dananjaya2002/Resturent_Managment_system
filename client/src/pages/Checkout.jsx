@@ -11,6 +11,8 @@ const Checkout = () => {
   const { cartItems, getCartTotal, clearCart } = useCart();
 
   const [formData, setFormData] = useState({
+    orderType: "delivery",
+    tableNumber: "",
     street: "",
     city: "",
     postalCode: "",
@@ -44,16 +46,22 @@ const Checkout = () => {
           menuItem: item._id,
           quantity: item.quantity,
         })),
-        deliveryAddress: {
+        orderType: formData.orderType,
+        orderNotes: formData.orderNotes,
+        paymentMethod: formData.paymentMethod,
+      };
+
+      if (formData.orderType === 'dine-in') {
+        orderData.tableNumber = parseInt(formData.tableNumber);
+      } else {
+        orderData.deliveryAddress = {
           street: formData.street,
           city: formData.city,
           postalCode: formData.postalCode,
           phone: formData.phone,
           notes: formData.notes,
-        },
-        orderNotes: formData.orderNotes,
-        paymentMethod: formData.paymentMethod,
-      };
+        };
+      }
 
       const response = await axios.post(
         "http://localhost:5000/api/orders",
@@ -130,72 +138,116 @@ const Checkout = () => {
 
           {error && <div className="error-message">{error}</div>}
 
-          <form onSubmit={handleSubmit} className="checkout-form">
+          <form onSubmit={handleSubmit}>
             <div className="form-group">
-              <label htmlFor="street">Street Address *</label>
-              <input
-                type="text"
-                id="street"
-                name="street"
-                value={formData.street}
-                onChange={handleChange}
-                required
-                placeholder="123 Main Street"
-              />
-            </div>
-
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="city">City *</label>
-                <input
-                  type="text"
-                  id="city"
-                  name="city"
-                  value={formData.city}
-                  onChange={handleChange}
-                  required
-                  placeholder="New York"
-                />
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="postalCode">Postal Code *</label>
-                <input
-                  type="text"
-                  id="postalCode"
-                  name="postalCode"
-                  value={formData.postalCode}
-                  onChange={handleChange}
-                  required
-                  placeholder="10001"
-                />
+              <label>Order Type</label>
+              <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
+                <label className="radio-label" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
+                  <input
+                    type="radio"
+                    name="orderType"
+                    value="delivery"
+                    checked={formData.orderType === 'delivery'}
+                    onChange={handleChange}
+                  />
+                  Delivery
+                </label>
+                <label className="radio-label" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
+                  <input
+                    type="radio"
+                    name="orderType"
+                    value="dine-in"
+                    checked={formData.orderType === 'dine-in'}
+                    onChange={handleChange}
+                  />
+                  Dine-in
+                </label>
               </div>
             </div>
 
-            <div className="form-group">
-              <label htmlFor="phone">Phone Number *</label>
-              <input
-                type="tel"
-                id="phone"
-                name="phone"
-                value={formData.phone}
-                onChange={handleChange}
-                required
-                placeholder="+1 (555) 123-4567"
-              />
-            </div>
+            {formData.orderType === 'dine-in' ? (
+              <div className="form-group">
+                <label htmlFor="tableNumber">Table Number *</label>
+                <input
+                  type="number"
+                  id="tableNumber"
+                  name="tableNumber"
+                  value={formData.tableNumber}
+                  onChange={handleChange}
+                  required
+                  min="1"
+                  placeholder="e.g. 5"
+                />
+              </div>
+            ) : (
+              <>
+                <div className="form-group">
+                  <label htmlFor="street">Street Address *</label>
+                  <input
+                    type="text"
+                    id="street"
+                    name="street"
+                    value={formData.street}
+                    onChange={handleChange}
+                    required
+                    placeholder="123 Main Street"
+                  />
+                </div>
 
-            <div className="form-group">
-              <label htmlFor="notes">Delivery Notes</label>
-              <textarea
-                id="notes"
-                name="notes"
-                value={formData.notes}
-                onChange={handleChange}
-                rows="2"
-                placeholder="e.g., Ring doorbell twice"
-              />
-            </div>
+                <div className="form-row">
+                  <div className="form-group">
+                    <label htmlFor="city">City *</label>
+                    <input
+                      type="text"
+                      id="city"
+                      name="city"
+                      value={formData.city}
+                      onChange={handleChange}
+                      required
+                      placeholder="New York"
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label htmlFor="postalCode">Postal Code *</label>
+                    <input
+                      type="text"
+                      id="postalCode"
+                      name="postalCode"
+                      value={formData.postalCode}
+                      onChange={handleChange}
+                      required
+                      placeholder="10001"
+                    />
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="phone">Phone Number *</label>
+                  <input
+                    type="tel"
+                    id="phone"
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleChange}
+                    required
+                    placeholder="+1 (555) 123-4567"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="notes">Delivery Notes</label>
+                  <textarea
+                    id="notes"
+                    name="notes"
+                    value={formData.notes}
+                    onChange={handleChange}
+                    rows="2"
+                    placeholder="e.g., Ring doorbell twice"
+                  />
+                </div>
+              </>
+            )}
 
             <div className="form-group">
               <label htmlFor="orderNotes">Order Notes</label>
@@ -218,8 +270,8 @@ const Checkout = () => {
                 onChange={handleChange}
                 required
               >
-                <option value="cash">Cash on Delivery</option>
-                <option value="card">Card on Delivery</option>
+                <option value="cash">Cash</option>
+                <option value="card">Card</option>
                 <option value="online">Online Payment</option>
               </select>
             </div>

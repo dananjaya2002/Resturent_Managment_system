@@ -7,15 +7,15 @@ const {
   updateMenuItem,
   deleteMenuItem,
 } = require("../controllers/menuController");
-const { protect, admin } = require("../middleware/authMiddleware");
+const { protect, authorize } = require("../middleware/authMiddleware");
 
 // Public routes
 router.get("/", getMenuItems);
 router.get("/:id", getMenuItemById);
 
 // Admin routes
-router.post("/", protect, admin, createMenuItem);
-router.put("/:id", protect, admin, updateMenuItem);
-router.delete("/:id", protect, admin, deleteMenuItem);
+router.post("/", protect, authorize('admin'), createMenuItem);
+router.put("/:id", protect, authorize('admin', 'manager', 'owner', 'chef'), updateMenuItem);
+router.delete("/:id", protect, authorize('admin', 'owner', 'manager'), deleteMenuItem);
 
 module.exports = router;

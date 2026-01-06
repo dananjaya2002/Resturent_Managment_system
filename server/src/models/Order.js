@@ -67,22 +67,31 @@ const orderSchema = new mongoose.Schema(
       enum: ["cash", "card", "online"],
       default: "cash",
     },
+    orderType: {
+      type: String,
+      enum: ["delivery", "dine-in", "takeaway"],
+      default: "delivery",
+    },
+    tableNumber: {
+      type: Number,
+      required: function () { return this.orderType === 'dine-in'; }
+    },
     deliveryAddress: {
       street: {
         type: String,
-        required: true,
+        required: function () { return this.orderType === 'delivery'; }
       },
       city: {
         type: String,
-        required: true,
+        required: function () { return this.orderType === 'delivery'; }
       },
       postalCode: {
         type: String,
-        required: true,
+        required: function () { return this.orderType === 'delivery'; }
       },
       phone: {
         type: String,
-        required: true,
+        required: function () { return this.orderType === 'delivery'; }
       },
       notes: {
         type: String,
