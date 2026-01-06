@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import { useCart } from "../context/CartContext";
-
-const API_URL = "http://localhost:5000/api";
+import API_URL from "../config/api";
 
 const Menu = () => {
   const [menuItems, setMenuItems] = useState([]);

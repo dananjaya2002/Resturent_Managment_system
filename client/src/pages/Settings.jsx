@@ -1,6 +1,7 @@
 import React, { useState, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import axios from 'axios';
+import API_URL from '../config/api';
 
 // Simple Settings Page Component
 const Settings = () => {
@@ -43,7 +44,7 @@ const Settings = () => {
                 ...(formData.password && { password: formData.password })
             };
 
-            const res = await axios.put('http://localhost:5000/api/auth/profile', updateData, config);
+            const res = await axios.put(`${API_URL}/auth/profile`, updateData, config);
 
             setMessage('Profile Updated Successfully');
             // Optimistically update or reload user? 

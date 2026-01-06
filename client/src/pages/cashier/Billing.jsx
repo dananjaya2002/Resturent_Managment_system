@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useSocket } from '../../context/SocketContext';
+import API_URL from '../../config/api';
 
 const Billing = () => {
     const [orders, setOrders] = useState([]);
@@ -10,7 +11,7 @@ const Billing = () => {
     const fetchOrders = async () => {
         try {
             const token = localStorage.getItem('token');
-            const res = await axios.get('http://localhost:5000/api/orders?limit=100', {
+            const res = await axios.get(`${API_URL}/orders?limit=100`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             // Show all active orders (not delivered OR delivered but unpaid)
@@ -45,7 +46,7 @@ const Billing = () => {
         if (!confirm('Mark this order as PAID?')) return;
         try {
             const token = localStorage.getItem('token');
-            await axios.put(`http://localhost:5000/api/orders/${orderId}/payment`,
+            await axios.put(`${API_URL}/orders/${orderId}/payment`,
                 { paymentStatus: 'paid' },
                 { headers: { Authorization: `Bearer ${token}` } }
             );

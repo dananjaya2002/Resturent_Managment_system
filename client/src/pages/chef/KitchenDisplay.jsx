@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useSocket } from '../../context/SocketContext';
+import API_URL from '../../config/api';
 
 const KitchenDisplay = () => {
     const [orders, setOrders] = useState([]);
@@ -11,7 +12,7 @@ const KitchenDisplay = () => {
         try {
             const token = localStorage.getItem('token');
             // Fetch orders with status 'pending', 'confirmed', 'preparing'
-            const res = await axios.get('http://localhost:5000/api/orders?limit=100', {
+            const res = await axios.get(`${API_URL}/orders?limit=100`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             // Filter strictly for kitchen relevant statuses
@@ -53,7 +54,7 @@ const KitchenDisplay = () => {
     const updateStatus = async (id, status) => {
         try {
             const token = localStorage.getItem('token');
-            await axios.put(`http://localhost:5000/api/orders/${id}/status`,
+            await axios.put(`${API_URL}/orders/${id}/status`,
                 { orderStatus: status },
                 { headers: { Authorization: `Bearer ${token}` } }
             );

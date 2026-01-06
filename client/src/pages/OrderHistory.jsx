@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useAuth } from "../context/AuthContext";
 import { useSocket } from "../context/SocketContext";
+import API_URL from "../config/api";
 import "./OrderHistory.css";
 
 const OrderHistory = () => {
@@ -22,8 +23,8 @@ const OrderHistory = () => {
 
       const url =
         filter === "all"
-          ? "http://localhost:5000/api/orders"
-          : `http://localhost:5000/api/orders?status=${filter}`;
+          ? `${API_URL}/orders`
+          : `${API_URL}/orders?status=${filter}`;
 
       const response = await axios.get(url, {
         headers: {

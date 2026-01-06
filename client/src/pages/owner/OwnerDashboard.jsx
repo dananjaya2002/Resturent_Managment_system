@@ -1,167 +1,310 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import ManagerDashboard from '../manager/ManagerDashboard'; // Reuse stats view
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import ManagerDashboard from "../manager/ManagerDashboard"; // Reuse stats view
+import API_URL from "../../config/api";
 
 const OwnerDashboard = () => {
-    const [view, setView] = useState('stats'); // 'stats' or 'employees'
-    const [employees, setEmployees] = useState([]);
-    const [newEmployee, setNewEmployee] = useState({ name: '', email: '', password: '', role: 'staff' });
+  const [view, setView] = useState("stats"); // 'stats' or 'employees'
+  const [employees, setEmployees] = useState([]);
+  const [newEmployee, setNewEmployee] = useState({
+    name: "",
+    email: "",
+    password: "",
+    role: "staff",
+  });
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterRole, setFilterRole] = useState("all");
 
-    const fetchEmployees = async () => {
-        try {
-            const token = localStorage.getItem('token');
-            const res = await axios.get('http://localhost:5000/api/auth/users', {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            // Filter to show staff/managers/etc (exclude customers if needed, but let's show all for owner)
-            setEmployees(res.data);
-        } catch (err) {
-            console.error(err);
-        }
+  const fetchEmployees = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const res = await axios.get(`${API_URL}/auth/users`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setEmployees(res.data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  useEffect(() => {
+    if (view === "employees") {
+      fetchEmployees();
+    }
+  }, [view]);
+
+  const handleCreateEmployee = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.post(`${API_URL}/auth/register`, newEmployee);
+      alert("Employee Created Successfully!");
+      setNewEmployee({ name: "", email: "", password: "", role: "staff" });
+      fetchEmployees();
+    } catch (err) {
+      alert(err.response?.data?.message || "Failed to create employee");
+    }
+  };
+
+  const handleDeleteEmployee = async (id) => {
+    if (!confirm("Are you sure you want to delete this user?")) return;
+    try {
+      const token = localStorage.getItem("token");
+      await axios.delete(`${API_URL}/auth/users/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      fetchEmployees();
+    } catch (err) {
+      alert("Failed to delete user");
+    }
+  };
+
+  const filteredEmployees = employees.filter((emp) => {
+    const matchesSearch =
+      emp.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      emp.email.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesRole = filterRole === "all" || emp.role === filterRole;
+    return matchesSearch && matchesRole;
+  });
+
+  const getRoleIcon = (role) => {
+    const icons = {
+      admin: "⚙️",
+      waiter: "👔",
+      chef: "👨‍🍳",
+      cashier: "💰",
+      manager: "📊",
+      owner: "👑",
+      delivery: "🚚",
+      staff: "👤",
     };
+    return icons[role] || "👤";
+  };
 
-    useEffect(() => {
-        if (view === 'employees') {
-            fetchEmployees();
-        }
-    }, [view]);
-
-    const handleCreateEmployee = async (e) => {
-        e.preventDefault();
-        try {
-            await axios.post('http://localhost:5000/api/auth/register', newEmployee);
-            alert('Employee Created');
-            setNewEmployee({ name: '', email: '', password: '', role: 'staff' });
-            fetchEmployees();
-        } catch (err) {
-            alert(err.response?.data?.message || 'Failed to create employee');
-        }
+  const getRoleColor = (role) => {
+    const colors = {
+      admin: "#e74c3c",
+      owner: "#9b59b6",
+      manager: "#3498db",
+      chef: "#e67e22",
+      waiter: "#1abc9c",
+      cashier: "#f39c12",
+      delivery: "#34495e",
+      staff: "#95a5a6",
     };
+    return colors[role] || "#95a5a6";
+  };
 
-    const handleDeleteEmployee = async (id) => {
-        if (!confirm('Delete this user?')) return;
-        try {
-            const token = localStorage.getItem('token');
-            await axios.delete(`http://localhost:5000/api/auth/users/${id}`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            fetchEmployees();
-        } catch (err) {
-            alert('Failed to delete user');
-        }
-    };
+  return (
+    <div className="dashboard-container owner-dashboard">
+      <div className="dashboard-header">
+        <div className="header-content">
+          <h1 className="dashboard-title">
+            <span className="title-icon">👑</span>
+            Owner Dashboard
+          </h1>
+          <p className="dashboard-subtitle">
+            Complete business overview and employee management
+          </p>
+        </div>
+        <div className="view-switcher">
+          <button
+            className={`view-btn ${view === "stats" ? "active" : ""}`}
+            onClick={() => setView("stats")}
+          >
+            <span>📊</span> Overview
+          </button>
+          <button
+            className={`view-btn ${view === "employees" ? "active" : ""}`}
+            onClick={() => setView("employees")}
+          >
+            <span>👥</span> Employees
+          </button>
+        </div>
+      </div>
 
-    return (
-        <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '1rem' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-                <h1>Owner Dashboard</h1>
-                <div>
-                    <button
-                        className={`btn ${view === 'stats' ? 'btn-primary' : ''}`}
-                        onClick={() => setView('stats')}
-                        style={{ marginRight: '1rem' }}
-                    >
-                        Overview
-                    </button>
-                    <button
-                        className={`btn ${view === 'employees' ? 'btn-primary' : ''}`}
-                        onClick={() => setView('employees')}
-                    >
-                        Employee Management
-                    </button>
+      {view === "stats" ? (
+        <ManagerDashboard />
+      ) : (
+        <div className="employee-management">
+          <div className="management-grid">
+            {/* Create Employee Form */}
+            <div className="employee-form-card">
+              <div className="card-header">
+                <h2 className="card-title">
+                  <span className="card-icon">➕</span>
+                  Add New Employee
+                </h2>
+              </div>
+              <form onSubmit={handleCreateEmployee} className="modern-form">
+                <div className="form-group">
+                  <label className="form-label">
+                    <span className="label-icon">👤</span>
+                    Full Name
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    className="form-input"
+                    placeholder="Enter employee name"
+                    value={newEmployee.name}
+                    onChange={(e) =>
+                      setNewEmployee({ ...newEmployee, name: e.target.value })
+                    }
+                  />
                 </div>
+                <div className="form-group">
+                  <label className="form-label">
+                    <span className="label-icon">📧</span>
+                    Email Address
+                  </label>
+                  <input
+                    type="email"
+                    required
+                    className="form-input"
+                    placeholder="employee@example.com"
+                    value={newEmployee.email}
+                    onChange={(e) =>
+                      setNewEmployee({ ...newEmployee, email: e.target.value })
+                    }
+                  />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">
+                    <span className="label-icon">🔒</span>
+                    Password
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    className="form-input"
+                    placeholder="Enter password"
+                    value={newEmployee.password}
+                    onChange={(e) =>
+                      setNewEmployee({
+                        ...newEmployee,
+                        password: e.target.value,
+                      })
+                    }
+                  />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">
+                    <span className="label-icon">💼</span>
+                    Role
+                  </label>
+                  <select
+                    className="form-input form-select"
+                    value={newEmployee.role}
+                    onChange={(e) =>
+                      setNewEmployee({ ...newEmployee, role: e.target.value })
+                    }
+                  >
+                    <option value="waiter">Waiter</option>
+                    <option value="chef">Chef</option>
+                    <option value="cashier">Cashier</option>
+                    <option value="manager">Manager</option>
+                    <option value="delivery">Delivery</option>
+                    <option value="staff">Staff</option>
+                    <option value="admin">Admin</option>
+                  </select>
+                </div>
+                <button type="submit" className="btn btn-primary btn-full">
+                  <span>➕</span> Create Employee
+                </button>
+              </form>
             </div>
 
-            {view === 'stats' ? (
-                <ManagerDashboard />
-            ) : (
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '2rem' }}>
-                    {/* Create Employee Form */}
-                    <div className="card">
-                        <h2>Add New Employee</h2>
-                        <form onSubmit={handleCreateEmployee}>
-                            <div className="form-group">
-                                <label>Name</label>
-                                <input
-                                    type="text" required
-                                    value={newEmployee.name}
-                                    onChange={e => setNewEmployee({ ...newEmployee, name: e.target.value })}
-                                />
-                            </div>
-                            <div className="form-group">
-                                <label>Email</label>
-                                <input
-                                    type="email" required
-                                    value={newEmployee.email}
-                                    onChange={e => setNewEmployee({ ...newEmployee, email: e.target.value })}
-                                />
-                            </div>
-                            <div className="form-group">
-                                <label>Password</label>
-                                <input
-                                    type="text" required
-                                    value={newEmployee.password}
-                                    onChange={e => setNewEmployee({ ...newEmployee, password: e.target.value })}
-                                />
-                            </div>
-                            <div className="form-group">
-                                <label>Role</label>
-                                <select
-                                    value={newEmployee.role}
-                                    onChange={e => setNewEmployee({ ...newEmployee, role: e.target.value })}
-                                >
-                                    <option value="waiter">Waiter</option>
-                                    <option value="chef">Chef</option>
-                                    <option value="cashier">Cashier</option>
-                                    <option value="manager">Manager</option>
-                                    <option value="delivery">Delivery</option>
-                                    <option value="staff">Staff</option>
-                                    <option value="admin">Admin</option>
-                                </select>
-                            </div>
-                            <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>Create User</button>
-                        </form>
-                    </div>
+            {/* Employee List */}
+            <div className="employee-list-card">
+              <div className="card-header">
+                <h2 className="card-title">
+                  <span className="card-icon">👥</span>
+                  Employee Directory
+                </h2>
+                <span className="employee-count">
+                  {filteredEmployees.length} employees
+                </span>
+              </div>
 
-                    {/* Employee List */}
-                    <div className="card">
-                        <h2>Staff List</h2>
-                        <div style={{ overflowY: 'auto', maxHeight: '500px' }}>
-                            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                                <thead>
-                                    <tr style={{ background: '#f5f5f5', textAlign: 'left' }}>
-                                        <th style={{ padding: '0.5rem' }}>Name</th>
-                                        <th style={{ padding: '0.5rem' }}>Role</th>
-                                        <th style={{ padding: '0.5rem' }}>Email</th>
-                                        <th style={{ padding: '0.5rem' }}>Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {employees.map(user => (
-                                        <tr key={user._id} style={{ borderBottom: '1px solid #eee' }}>
-                                            <td style={{ padding: '0.5rem' }}>{user.name}</td>
-                                            <td style={{ padding: '0.5rem' }}>
-                                                <span className={`status-badge role-${user.role}`}>{user.role}</span>
-                                            </td>
-                                            <td style={{ padding: '0.5rem' }}>{user.email}</td>
-                                            <td style={{ padding: '0.5rem' }}>
-                                                <button
-                                                    onClick={() => handleDeleteEmployee(user._id)}
-                                                    style={{ color: 'red', border: 'none', background: 'none', cursor: 'pointer' }}
-                                                >
-                                                    Delete
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
+              {/* Search and Filter */}
+              <div className="search-filter-section">
+                <div className="search-box">
+                  <span className="search-icon">🔍</span>
+                  <input
+                    type="text"
+                    placeholder="Search employees..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="search-input"
+                  />
                 </div>
-            )}
+                <select
+                  value={filterRole}
+                  onChange={(e) => setFilterRole(e.target.value)}
+                  className="role-filter"
+                >
+                  <option value="all">All Roles</option>
+                  <option value="admin">Admin</option>
+                  <option value="manager">Manager</option>
+                  <option value="chef">Chef</option>
+                  <option value="waiter">Waiter</option>
+                  <option value="cashier">Cashier</option>
+                  <option value="delivery">Delivery</option>
+                  <option value="staff">Staff</option>
+                </select>
+              </div>
+
+              {/* Employee Cards */}
+              <div className="employee-cards">
+                {filteredEmployees.map((user) => (
+                  <div key={user._id} className="employee-card">
+                    <div className="employee-card-header">
+                      <div
+                        className="employee-avatar"
+                        style={{ background: getRoleColor(user.role) }}
+                      >
+                        {user.name.charAt(0).toUpperCase()}
+                      </div>
+                      <div className="employee-info">
+                        <h4 className="employee-name">{user.name}</h4>
+                        <p className="employee-email">{user.email}</p>
+                      </div>
+                    </div>
+                    <div className="employee-card-body">
+                      <div
+                        className="employee-role"
+                        style={{ background: getRoleColor(user.role) }}
+                      >
+                        <span className="role-icon">
+                          {getRoleIcon(user.role)}
+                        </span>
+                        <span className="role-text">{user.role}</span>
+                      </div>
+                    </div>
+                    <div className="employee-card-actions">
+                      <button
+                        onClick={() => handleDeleteEmployee(user._id)}
+                        className="delete-employee-btn"
+                      >
+                        <span>🗑️</span> Delete
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {filteredEmployees.length === 0 && (
+                <div className="empty-state">
+                  <span className="empty-icon">👥</span>
+                  <p>No employees found matching your criteria</p>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
-    );
+      )}
+    </div>
+  );
 };
 
 export default OwnerDashboard;

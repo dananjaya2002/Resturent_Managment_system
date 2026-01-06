@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
+import API_URL from "../config/api";
 import "./Cart.css";
 
 const Cart = () => {
@@ -71,7 +72,7 @@ const Cart = () => {
                         <div className="cart-item-image">
                           {item.imageUrl ? (
                             <img
-                              src={`http://localhost:5000${item.imageUrl}`}
+                              src={`${API_URL.replace('/api', '')}${item.imageUrl}`}
                               alt={item.name}
                             />
                           ) : (

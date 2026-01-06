@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useAuth } from "../context/AuthContext";
 import { useSocket } from "../context/SocketContext";
+import API_URL from "../config/api";
 import "./OrderTracking.css";
 
 const OrderTracking = () => {
@@ -21,7 +22,7 @@ const OrderTracking = () => {
       const token = localStorage.getItem("token");
 
       const response = await axios.get(
-        `http://localhost:5000/api/orders/${orderId}`,
+        `${API_URL}/orders/${orderId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -87,7 +88,7 @@ const OrderTracking = () => {
     try {
       const token = localStorage.getItem("token");
 
-      await axios.delete(`http://localhost:5000/api/orders/${orderId}`, {
+      await axios.delete(`${API_URL}/orders/${orderId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

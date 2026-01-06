@@ -1,98 +1,230 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { Link } from "react-router-dom";
+import API_URL from "../../config/api";
 
 const OrderTrackingList = () => {
-    const [orders, setOrders] = useState([]);
-    const [loading, setLoading] = useState(true);
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [filter, setFilter] = useState("all"); // all, pending, preparing, ready
 
-    const fetchOrders = async () => {
-        try {
-            const token = localStorage.getItem('token');
-            // Assuming we have an endpoint to get active orders
-            // For now fetching all, but ideally should be filter by status NOT delivered
-            const res = await axios.get('http://localhost:5000/api/orders', {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            // simple client side filter for active orders
-            const activeOrders = res.data.filter(o => o.orderStatus !== 'delivered' && o.orderStatus !== 'cancelled');
-            setOrders(activeOrders);
-            setLoading(false);
-        } catch (err) {
-            console.error(err);
-            setLoading(false);
-        }
+  const fetchOrders = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const res = await axios.get(`${API_URL}/orders`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      // API returns { orders: [], currentPage, totalPages } - extract the orders array
+      const ordersData = res.data.orders || res.data;
+      // Filter for active orders only
+      const activeOrders = Array.isArray(ordersData)
+        ? ordersData.filter(
+            (o) =>
+              o.orderStatus !== "delivered" && o.orderStatus !== "cancelled"
+          )
+        : [];
+      setOrders(activeOrders);
+      setLoading(false);
+    } catch (err) {
+      console.error(err);
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchOrders();
+    // Polling for updates every 10 seconds
+    const interval = setInterval(fetchOrders, 10000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const markDelivered = async (id) => {
+    try {
+      const token = localStorage.getItem("token");
+      await axios.put(
+        `${API_URL}/orders/${id}/status`,
+        { status: "delivered" },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      fetchOrders();
+    } catch (err) {
+      alert("Failed to update order");
+    }
+  };
+
+  const getStatusIcon = (status) => {
+    const icons = {
+      pending: "⏳",
+      preparing: "👨‍🍳",
+      ready: "✅",
+      delivered: "🚚",
+      cancelled: "❌",
     };
+    return icons[status] || "📦";
+  };
 
-    useEffect(() => {
-        fetchOrders();
-        // Polling for updates every 10 seconds for now (Socket.io will be better later)
-        const interval = setInterval(fetchOrders, 10000);
-        return () => clearInterval(interval);
-    }, []);
-
-    const markDelivered = async (id) => {
-        try {
-            const token = localStorage.getItem('token');
-            // Assuming endpoint to update delivery status exists or using generic update
-            // We might need to add a specific route for this or use the generic one if available
-            // Let's assume PUT /api/orders/:id/deliver for now or generic update
-            await axios.put(`http://localhost:5000/api/orders/${id}/status`,
-                { status: 'delivered' },
-                { headers: { Authorization: `Bearer ${token}` } }
-            );
-            fetchOrders();
-        } catch (err) {
-            alert('Failed to update order');
-        }
+  const getStatusColor = (status) => {
+    const colors = {
+      pending: "warning",
+      preparing: "info",
+      ready: "success",
+      delivered: "default",
+      cancelled: "error",
     };
+    return colors[status] || "default";
+  };
 
-    if (loading) return <div>Loading Orders...</div>;
+  const filteredOrders = orders.filter((order) => {
+    if (filter === "all") return true;
+    return order.orderStatus === filter;
+  });
 
+  const stats = {
+    total: orders.length,
+    pending: orders.filter((o) => o.orderStatus === "pending").length,
+    preparing: orders.filter((o) => o.orderStatus === "preparing").length,
+    ready: orders.filter((o) => o.orderStatus === "ready").length,
+  };
+
+  if (loading) {
     return (
-        <div className="order-tracking-list">
-            <h3>Active Orders</h3>
-            {orders.length === 0 ? <p>No active orders.</p> : (
-                <div className="table-container">
-                    <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                        <thead>
-                            <tr style={{ textAlign: 'left', borderBottom: '2px solid #ddd' }}>
-                                <th style={{ padding: '0.5rem' }}>Order #</th>
-                                <th style={{ padding: '0.5rem' }}>Status</th>
-                                <th style={{ padding: '0.5rem' }}>Total</th>
-                                <th style={{ padding: '0.5rem' }}>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {orders.map(order => (
-                                <tr key={order._id} style={{ borderBottom: '1px solid #eee' }}>
-                                    <td style={{ padding: '0.5rem' }}>
-                                        <Link to={`/orders/${order._id}`}>{order.orderNumber}</Link>
-                                    </td>
-                                    <td style={{ padding: '0.5rem' }}>
-                                        <span className={`status-badge status-${order.orderStatus}`}>
-                                            {order.orderStatus}
-                                        </span>
-                                    </td>
-                                    <td style={{ padding: '0.5rem' }}>${order.totalAmount}</td>
-                                    <td style={{ padding: '0.5rem' }}>
-                                        {order.orderStatus === 'ready' && (
-                                            <button
-                                                className="btn btn-primary"
-                                                onClick={() => markDelivered(order._id)}
-                                            >
-                                                Deliver
-                                            </button>
-                                        )}
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-            )}
-        </div>
+      <div className="loading-container">
+        <div className="spinner"></div>
+        <p>Loading Orders...</p>
+      </div>
     );
+  }
+
+  return (
+    <div className="order-tracking-list">
+      {/* Quick Stats */}
+      <div className="order-stats">
+        <div className="order-stat-item">
+          <span className="stat-number">{stats.total}</span>
+          <span className="stat-label">Total Active</span>
+        </div>
+        <div className="order-stat-item warning">
+          <span className="stat-number">{stats.pending}</span>
+          <span className="stat-label">Pending</span>
+        </div>
+        <div className="order-stat-item info">
+          <span className="stat-number">{stats.preparing}</span>
+          <span className="stat-label">Preparing</span>
+        </div>
+        <div className="order-stat-item success">
+          <span className="stat-number">{stats.ready}</span>
+          <span className="stat-label">Ready</span>
+        </div>
+      </div>
+
+      {/* Filter Tabs */}
+      <div className="order-filters">
+        <button
+          className={`filter-tab ${filter === "all" ? "active" : ""}`}
+          onClick={() => setFilter("all")}
+        >
+          All
+        </button>
+        <button
+          className={`filter-tab ${filter === "pending" ? "active" : ""}`}
+          onClick={() => setFilter("pending")}
+        >
+          Pending
+        </button>
+        <button
+          className={`filter-tab ${filter === "preparing" ? "active" : ""}`}
+          onClick={() => setFilter("preparing")}
+        >
+          Preparing
+        </button>
+        <button
+          className={`filter-tab ${filter === "ready" ? "active" : ""}`}
+          onClick={() => setFilter("ready")}
+        >
+          Ready
+        </button>
+      </div>
+
+      {/* Orders Table */}
+      {filteredOrders.length === 0 ? (
+        <div className="empty-state">
+          <span className="empty-icon">📋</span>
+          <p>No active orders found</p>
+        </div>
+      ) : (
+        <div className="modern-table-container">
+          <table className="modern-table">
+            <thead>
+              <tr>
+                <th>Order</th>
+                <th>Status</th>
+                <th>Amount</th>
+                <th>Time</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredOrders.map((order) => (
+                <tr key={order._id} className="table-row-hover">
+                  <td>
+                    <Link to={`/orders/${order._id}`} className="order-link">
+                      <div className="order-number">
+                        <span className="order-icon">📦</span>
+                        <span className="order-id">#{order.orderNumber}</span>
+                      </div>
+                    </Link>
+                  </td>
+                  <td>
+                    <span
+                      className={`modern-badge badge-${getStatusColor(
+                        order.orderStatus
+                      )}`}
+                    >
+                      <span className="badge-icon">
+                        {getStatusIcon(order.orderStatus)}
+                      </span>
+                      {order.orderStatus}
+                    </span>
+                  </td>
+                  <td>
+                    <span className="amount-text">
+                      ${order.totalAmount.toFixed(2)}
+                    </span>
+                  </td>
+                  <td>
+                    <span className="time-text">
+                      {new Date(order.createdAt).toLocaleTimeString("en-US", {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </span>
+                  </td>
+                  <td>
+                    {order.orderStatus === "ready" && (
+                      <button
+                        className="action-btn deliver"
+                        onClick={() => markDelivered(order._id)}
+                      >
+                        <span>✓</span> Deliver
+                      </button>
+                    )}
+                    {order.orderStatus !== "ready" && (
+                      <Link
+                        to={`/orders/${order._id}`}
+                        className="action-btn view"
+                      >
+                        <span>👁️</span> View
+                      </Link>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
 };
 
 export default OrderTrackingList;

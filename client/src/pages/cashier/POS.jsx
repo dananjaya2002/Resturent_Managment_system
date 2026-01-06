@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useCart } from '../../context/CartContext';
+import API_URL from '../../config/api';
 
 const POS = () => {
     const [categories, setCategories] = useState([]);
@@ -22,8 +23,8 @@ const POS = () => {
         const fetchData = async () => {
             try {
                 const [catRes, menuRes] = await Promise.all([
-                    axios.get('http://localhost:5000/api/categories'),
-                    axios.get('http://localhost:5000/api/menu?isAvailable=true')
+                    axios.get(`${API_URL}/categories`),
+                    axios.get(`${API_URL}/menu?isAvailable=true`)
                 ]);
                 setCategories(catRes.data);
                 setMenuItems(menuRes.data);
@@ -60,7 +61,7 @@ const POS = () => {
                 orderNotes: 'Placed via POS'
             };
 
-            await axios.post('http://localhost:5000/api/orders', orderData, {
+            await axios.post(`${API_URL}/orders`, orderData, {
                 headers: { Authorization: `Bearer ${token}` }
             });
 
