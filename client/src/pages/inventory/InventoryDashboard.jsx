@@ -6,6 +6,8 @@ const InventoryDashboard = () => {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingItem, setEditingItem] = useState(null);
   const [newItem, setNewItem] = useState({
     itemName: "",
     quantity: 0,
@@ -64,6 +66,34 @@ const InventoryDashboard = () => {
       fetchInventory();
     } catch (err) {
       alert("Failed to update quantity");
+    }
+  };
+
+  const handleEditItem = (item) => {
+    setEditingItem({...item});
+    setShowEditModal(true);
+  };
+
+  const handleSaveEdit = async (e) => {
+    e.preventDefault();
+    try {
+      const token = localStorage.getItem("token");
+      await axios.put(
+        `${API_URL}/inventory/${editingItem._id}`,
+        {
+          itemName: editingItem.itemName,
+          quantity: editingItem.quantity,
+          unit: editingItem.unit,
+          lowStockThreshold: editingItem.lowStockThreshold,
+          category: editingItem.category
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      fetchInventory();
+      setShowEditModal(false);
+      setEditingItem(null);
+    } catch (err) {
+      alert(err.response?.data?.message || "Failed to update item");
     }
   };
 
@@ -164,12 +194,22 @@ const InventoryDashboard = () => {
                   )}
                 </td>
                 <td>
-                  <button
-                    onClick={() => handleDelete(item._id)}
-                    className="action-btn delete-btn"
-                  >
-                    <span>🗑️</span> Delete
-                  </button>
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <button
+                      onClick={() => handleEditItem(item)}
+                      className="action-btn edit-btn"
+                      title="Edit item"
+                    >
+                      <span>✏️</span> Edit
+                    </button>
+                    <button
+                      onClick={() => handleDelete(item._id)}
+                      className="action-btn delete-btn"
+                      title="Delete item"
+                    >
+                      <span>🗑️</span> Delete
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}
@@ -200,6 +240,7 @@ const InventoryDashboard = () => {
                 <input
                   type="text"
                   required
+                  maxLength="100"
                   className="form-input"
                   placeholder="Enter item name"
                   value={newItem.itemName}
@@ -213,15 +254,23 @@ const InventoryDashboard = () => {
                   <span className="label-icon">🏷️</span>
                   Category
                 </label>
-                <input
-                  type="text"
+                <select
                   className="form-input"
-                  placeholder="e.g., Vegetables, Meat, Spices"
                   value={newItem.category}
                   onChange={(e) =>
                     setNewItem({ ...newItem, category: e.target.value })
                   }
-                />
+                >
+                  <option value="General">General</option>
+                  <option value="Meat">Meat</option>
+                  <option value="Vegetables">Vegetables</option>
+                  <option value="Dairy">Dairy</option>
+                  <option value="Beverages">Beverages</option>
+                  <option value="Spices">Spices</option>
+                  <option value="Grains">Grains</option>
+                  <option value="Seafood">Seafood</option>
+                  <option value="Fruits">Fruits</option>
+                </select>
               </div>
               <div className="form-row">
                 <div className="form-group">
@@ -232,6 +281,8 @@ const InventoryDashboard = () => {
                   <input
                     type="number"
                     required
+                    min="0"
+                    max="1000000"
                     className="form-input"
                     placeholder="0"
                     value={newItem.quantity}
@@ -290,6 +341,150 @@ const InventoryDashboard = () => {
                 <button
                   type="button"
                   onClick={() => setShowAddModal(false)}
+                  className="btn btn-secondary"
+                >
+                  <span>✕</span> Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Item Modal */}
+      {showEditModal && editingItem && (
+        <div className="modal-overlay">
+          <div className="modern-modal">
+            <div className="modal-header">
+              <h2 className="modal-title">
+                <span className="modal-icon">✏️</span>
+                Edit Inventory Item
+              </h2>
+              <button
+                className="modal-close"
+                onClick={() => {
+                  setShowEditModal(false);
+                  setEditingItem(null);
+                }}
+              >
+                ✕
+              </button>
+            </div>
+            <form onSubmit={handleSaveEdit}>
+              <div className="form-group">
+                <label className="form-label">
+                  <span className="label-icon">📝</span>
+                  Item Name
+                </label>
+                <input
+                  type="text"
+                  required
+                  maxLength="100"
+                  className="form-input"
+                  placeholder="Enter item name"
+                  value={editingItem.itemName}
+                  onChange={(e) =>
+                    setEditingItem({ ...editingItem, itemName: e.target.value })
+                  }
+                />
+              </div>
+              <div className="form-group">
+                <label className="form-label">
+                  <span className="label-icon">🏷️</span>
+                  Category
+                </label>
+                <select
+                  className="form-input"
+                  value={editingItem.category}
+                  onChange={(e) =>
+                    setEditingItem({ ...editingItem, category: e.target.value })
+                  }
+                >
+                  <option value="General">General</option>
+                  <option value="Meat">Meat</option>
+                  <option value="Vegetables">Vegetables</option>
+                  <option value="Dairy">Dairy</option>
+                  <option value="Beverages">Beverages</option>
+                  <option value="Spices">Spices</option>
+                  <option value="Grains">Grains</option>
+                  <option value="Seafood">Seafood</option>
+                  <option value="Fruits">Fruits</option>
+                </select>
+              </div>
+              <div className="form-row">
+                <div className="form-group">
+                  <label className="form-label">
+                    <span className="label-icon">🔢</span>
+                    Quantity
+                  </label>
+                  <input
+                    type="number"
+                    required
+                    min="0"
+                    max="1000000"
+                    className="form-input"
+                    placeholder="0"
+                    value={editingItem.quantity}
+                    onChange={(e) =>
+                      setEditingItem({
+                        ...editingItem,
+                        quantity: Number(e.target.value),
+                      })
+                    }
+                  />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">
+                    <span className="label-icon">📏</span>
+                    Unit
+                  </label>
+                  <select
+                    className="form-input"
+                    value={editingItem.unit}
+                    onChange={(e) =>
+                      setEditingItem({ ...editingItem, unit: e.target.value })
+                    }
+                  >
+                    <option value="pcs">pcs</option>
+                    <option value="kg">kg</option>
+                    <option value="g">g</option>
+                    <option value="l">l</option>
+                    <option value="ml">ml</option>
+                    <option value="packs">packs</option>
+                  </select>
+                </div>
+              </div>
+              <div className="form-group">
+                <label className="form-label">
+                  <span className="label-icon">⚠️</span>
+                  Low Stock Threshold
+                </label>
+                <input
+                  type="number"
+                  required
+                  min="0"
+                  max="10000"
+                  className="form-input"
+                  placeholder="e.g., 10"
+                  value={editingItem.lowStockThreshold}
+                  onChange={(e) =>
+                    setEditingItem({
+                      ...editingItem,
+                      lowStockThreshold: Number(e.target.value),
+                    })
+                  }
+                />
+              </div>
+              <div className="modal-actions">
+                <button type="submit" className="btn btn-primary">
+                  <span>✓</span> Save Changes
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowEditModal(false);
+                    setEditingItem(null);
+                  }}
                   className="btn btn-secondary"
                 >
                   <span>✕</span> Cancel

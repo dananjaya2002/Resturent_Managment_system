@@ -81,9 +81,62 @@ const assignWaiter = async (req, res) => {
     }
 };
 
+// @desc    Update table details (number, capacity)
+// @route   PUT /api/tables/:id
+// @access  Private (Admin/Manager)
+const updateTable = async (req, res) => {
+    const { tableNumber, capacity } = req.body;
+
+    try {
+        const table = await Table.findById(req.params.id);
+
+        if (!table) {
+            return res.status(404).json({ message: 'Table not found' });
+        }
+
+        // Check if new table number is already taken by another table
+        if (tableNumber && tableNumber !== table.tableNumber) {
+            const existingTable = await Table.findOne({ tableNumber });
+            if (existingTable) {
+                return res.status(400).json({ message: 'Table number already exists' });
+            }
+            table.tableNumber = tableNumber;
+        }
+
+        if (capacity) {
+            table.capacity = capacity;
+        }
+
+        const updatedTable = await table.save();
+        res.json(updatedTable);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// @desc    Delete a table
+// @route   DELETE /api/tables/:id
+// @access  Private (Admin/Manager)
+const deleteTable = async (req, res) => {
+    try {
+        const table = await Table.findById(req.params.id);
+
+        if (!table) {
+            return res.status(404).json({ message: 'Table not found' });
+        }
+
+        await table.deleteOne();
+        res.json({ message: 'Table removed successfully' });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
 module.exports = {
     getTables,
     createTable,
     updateTableStatus,
-    assignWaiter
+    assignWaiter,
+    updateTable,
+    deleteTable
 };

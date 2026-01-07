@@ -14,6 +14,8 @@ import Checkout from "./pages/Checkout";
 import OrderHistory from "./pages/OrderHistory";
 import OrderTracking from "./pages/OrderTracking";
 import Cart from "./components/Cart";
+import ErrorBoundary from "./components/ErrorBoundary";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 import WaiterDashboard from "./pages/waiter/WaiterDashboard";
 import ChefDashboard from "./pages/chef/ChefDashboard";
@@ -216,38 +218,88 @@ const Navigation = () => {
 
 function App() {
   return (
-    <ThemeProvider>
-      <AuthProvider>
-        <SocketProvider>
-          <CartProvider>
-            <div className="app">
-              <Navigation />
-              <Cart />
+    <ErrorBoundary>
+      <ThemeProvider>
+        <AuthProvider>
+          <SocketProvider>
+            <CartProvider>
+              <div className="app">
+                <Navigation />
+                <Cart />
 
-              <main>
-                <Routes>
-                  <Route path="/" element={<Home />} />
-                  <Route path="/login" element={<Login />} />
-                  <Route path="/register" element={<Register />} />
-                  <Route path="/settings" element={<Settings />} />
-                  <Route path="/menu" element={<Menu />} />
-                  <Route path="/checkout" element={<Checkout />} />
-                  <Route path="/orders" element={<OrderHistory />} />
-                  <Route path="/orders/:orderId" element={<OrderTracking />} />
-                  <Route path="/admin" element={<AdminDashboard />} />
-                  <Route path="/waiter" element={<WaiterDashboard />} />
-                  <Route path="/chef" element={<ChefDashboard />} />
-                  <Route path="/cashier" element={<CashierDashboard />} />
-                  <Route path="/manager" element={<ManagerDashboard />} />
-                  <Route path="/owner" element={<OwnerDashboard />} />
-                  <Route path="/inventory" element={<InventoryDashboard />} />
-                </Routes>
-              </main>
-            </div>
-          </CartProvider>
-        </SocketProvider>
-      </AuthProvider>
-    </ThemeProvider>
+                <main>
+                  <Routes>
+                    <Route path="/" element={<Home />} />
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/register" element={<Register />} />
+                    <Route path="/menu" element={<Menu />} />
+                    
+                    {/* Protected Routes */}
+                    <Route path="/settings" element={
+                      <ProtectedRoute>
+                        <Settings />
+                      </ProtectedRoute>
+                    } />
+                    <Route path="/checkout" element={
+                      <ProtectedRoute allowedRoles={['customer']}>
+                        <Checkout />
+                      </ProtectedRoute>
+                    } />
+                    <Route path="/orders" element={
+                      <ProtectedRoute>
+                        <OrderHistory />
+                      </ProtectedRoute>
+                    } />
+                    <Route path="/orders/:orderId" element={
+                      <ProtectedRoute>
+                        <OrderTracking />
+                      </ProtectedRoute>
+                    } />
+                    
+                    {/* Role-based Protected Routes */}
+                    <Route path="/admin" element={
+                      <ProtectedRoute allowedRoles={['admin']}>
+                        <AdminDashboard />
+                      </ProtectedRoute>
+                    } />
+                    <Route path="/waiter" element={
+                      <ProtectedRoute allowedRoles={['waiter']}>
+                        <WaiterDashboard />
+                      </ProtectedRoute>
+                    } />
+                    <Route path="/chef" element={
+                      <ProtectedRoute allowedRoles={['chef']}>
+                        <ChefDashboard />
+                      </ProtectedRoute>
+                    } />
+                    <Route path="/cashier" element={
+                      <ProtectedRoute allowedRoles={['cashier']}>
+                        <CashierDashboard />
+                      </ProtectedRoute>
+                    } />
+                    <Route path="/manager" element={
+                      <ProtectedRoute allowedRoles={['manager']}>
+                        <ManagerDashboard />
+                      </ProtectedRoute>
+                    } />
+                    <Route path="/owner" element={
+                      <ProtectedRoute allowedRoles={['owner']}>
+                        <OwnerDashboard />
+                      </ProtectedRoute>
+                    } />
+                    <Route path="/inventory" element={
+                      <ProtectedRoute allowedRoles={['manager', 'owner', 'chef', 'admin']}>
+                        <InventoryDashboard />
+                      </ProtectedRoute>
+                    } />
+                  </Routes>
+                </main>
+              </div>
+            </CartProvider>
+          </SocketProvider>
+        </AuthProvider>
+      </ThemeProvider>
+    </ErrorBoundary>
   );
 }
 

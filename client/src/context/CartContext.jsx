@@ -1,6 +1,7 @@
 /* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useState, useEffect } from "react";
 import PropTypes from "prop-types";
+import { useAuth } from "./AuthContext";
 
 const CartContext = createContext();
 
@@ -12,10 +13,34 @@ export const useCart = () => {
   return context;
 };
 
+// Helper function to get or create a guest session ID
+const getGuestSessionId = () => {
+  let guestId = localStorage.getItem("guestSessionId");
+  if (!guestId) {
+    guestId = `guest_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    localStorage.setItem("guestSessionId", guestId);
+  }
+  return guestId;
+};
+
 export const CartProvider = ({ children }) => {
+  const { user } = useAuth();
+  
+  // Determine cart key based on user or guest session
+  const getCartKey = () => {
+    if (user) {
+      // For logged-in users, use their user ID
+      return `cart_${user._id}`;
+    } else {
+      // For guests, use a guest session ID
+      return `cart_${getGuestSessionId()}`;
+    }
+  };
+
   // Use lazy initialization to load from localStorage only once
   const [cartItems, setCartItems] = useState(() => {
-    const savedCart = localStorage.getItem("cart");
+    const cartKey = user ? `cart_${user._id}` : `cart_${getGuestSessionId()}`;
+    const savedCart = localStorage.getItem(cartKey);
     if (savedCart) {
       try {
         return JSON.parse(savedCart);
@@ -27,10 +52,28 @@ export const CartProvider = ({ children }) => {
     return [];
   });
 
-  // Save cart to localStorage whenever it changes
+  // Save cart to localStorage whenever it changes or user changes
   useEffect(() => {
-    localStorage.setItem("cart", JSON.stringify(cartItems));
-  }, [cartItems]);
+    const cartKey = getCartKey();
+    localStorage.setItem(cartKey, JSON.stringify(cartItems));
+  }, [cartItems, user]);
+
+  // Load cart when user changes (login/logout)
+  useEffect(() => {
+    const cartKey = getCartKey();
+    const savedCart = localStorage.getItem(cartKey);
+    if (savedCart) {
+      try {
+        setCartItems(JSON.parse(savedCart));
+      } catch (error) {
+        console.error("Error loading cart from localStorage:", error);
+        setCartItems([]);
+      }
+    } else {
+      setCartItems([]);
+    }
+  }, [user]);
+
 
   // Add item to cart
   const addToCart = (menuItem, quantity = 1) => {

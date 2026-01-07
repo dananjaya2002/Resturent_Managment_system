@@ -1,5 +1,6 @@
 const Order = require("../models/Order");
 const MenuItem = require("../models/MenuItem");
+const Table = require("../models/Table");
 
 // @desc    Create new order
 // @route   POST /api/orders
@@ -17,6 +18,11 @@ const createOrder = async (req, res) => {
     if (orderType === 'dine-in') {
       if (!tableNumber) {
         return res.status(400).json({ message: "Table number is required for dine-in orders" });
+      }
+      // Find the table by tableNumber
+      const table = await Table.findOne({ tableNumber });
+      if (!table) {
+        return res.status(404).json({ message: `Table ${tableNumber} not found` });
       }
     } else {
       // Default to delivery validation
@@ -68,6 +74,15 @@ const createOrder = async (req, res) => {
     // Calculate estimated delivery time (45 minutes from now)
     const estimatedDeliveryTime = new Date(Date.now() + 45 * 60 * 1000);
 
+    // Find table reference if dine-in
+    let tableRef = null;
+    if (orderType === 'dine-in' && tableNumber) {
+      const table = await Table.findOne({ tableNumber });
+      if (table) {
+        tableRef = table._id;
+      }
+    }
+
     // Create order
     const order = await Order.create({
       user: req.user._id,
@@ -78,7 +93,8 @@ const createOrder = async (req, res) => {
       paymentMethod: paymentMethod || "cash",
       estimatedDeliveryTime,
       orderType: orderType || 'delivery',
-      tableNumber
+      tableNumber,
+      table: tableRef
     });
 
     // Populate order details
@@ -101,12 +117,28 @@ const getOrders = async (req, res) => {
 
     let query = {};
 
-    // If not admin, only show user's own orders
-    if (req.user.role !== "admin") {
+    // Role-based order filtering
+    if (req.user.role === "customer") {
+      // Customers only see their own orders
+      query.user = req.user._id;
+    } else if (req.user.role === "chef") {
+      // Chef sees orders that need preparation: pending, confirmed, preparing
+      query.orderStatus = { $in: ["pending", "confirmed", "preparing"] };
+    } else if (req.user.role === "waiter") {
+      // Waiter sees all dine-in orders that are active
+      query.orderType = "dine-in";
+      query.orderStatus = { $nin: ["delivered", "cancelled"] };
+    } else if (req.user.role === "cashier") {
+      // Cashier sees orders ready for payment
+      query.orderStatus = { $in: ["ready", "delivered"] };
+    } else if (["admin", "manager", "owner"].includes(req.user.role)) {
+      // Admin, Manager, Owner see all orders (no filter)
+    } else {
+      // Default: user sees only their own orders
       query.user = req.user._id;
     }
 
-    // Filter by status if provided
+    // Filter by status if provided (overrides role-based status filtering)
     if (status) {
       query.orderStatus = status;
     }
@@ -147,10 +179,11 @@ const getOrderById = async (req, res) => {
     }
 
     // Check if user is authorized to view this order
-    if (
-      req.user.role !== "admin" &&
-      order.user._id.toString() !== req.user._id.toString()
-    ) {
+    const isAdmin = ["admin", "manager", "owner"].includes(req.user.role);
+    const isOwner = order.user._id.toString() === req.user._id.toString();
+    const isStaff = ["chef", "waiter", "cashier"].includes(req.user.role);
+    
+    if (!isAdmin && !isOwner && !isStaff) {
       return res
         .status(403)
         .json({ message: "Not authorized to view this order" });
@@ -346,6 +379,39 @@ const getOrderStats = async (req, res) => {
   }
 };
 
+// @desc    Get orders by table number
+// @route   GET /api/orders/by-table/:tableNumber
+// @access  Private (Waiter, Cashier, Admin, Manager, Owner)
+const getOrdersByTable = async (req, res) => {
+  try {
+    const { tableNumber } = req.params;
+    const { status } = req.query;
+
+    let query = {
+      orderType: "dine-in",
+      tableNumber: parseInt(tableNumber)
+    };
+
+    // Filter by status if provided
+    if (status) {
+      query.orderStatus = status;
+    } else {
+      // Default: only show active orders (not delivered or cancelled)
+      query.orderStatus = { $nin: ["delivered", "cancelled"] };
+    }
+
+    const orders = await Order.find(query)
+      .populate("user", "name email phone")
+      .populate("items.menuItem", "name imageUrl")
+      .populate("table", "tableNumber capacity status assignedWaiter")
+      .sort({ createdAt: -1 });
+
+    res.json(orders);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports = {
   createOrder,
   getOrders,
@@ -354,4 +420,5 @@ module.exports = {
   updatePaymentStatus,
   cancelOrder,
   getOrderStats,
+  getOrdersByTable,
 };

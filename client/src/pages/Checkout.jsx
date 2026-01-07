@@ -205,6 +205,7 @@ const Checkout = () => {
                     value={formData.street}
                     onChange={handleChange}
                     required
+                    maxLength="200"
                     placeholder="123 Main Street"
                   />
                 </div>
@@ -219,6 +220,7 @@ const Checkout = () => {
                       value={formData.city}
                       onChange={handleChange}
                       required
+                      maxLength="50"
                       placeholder="New York"
                     />
                   </div>
@@ -232,6 +234,8 @@ const Checkout = () => {
                       value={formData.postalCode}
                       onChange={handleChange}
                       required
+                      pattern="[0-9]{5,10}"
+                      title="Please enter a valid postal code (5-10 digits)"
                       placeholder="10001"
                     />
                   </div>
@@ -246,6 +250,8 @@ const Checkout = () => {
                     value={formData.phone}
                     onChange={handleChange}
                     required
+                    pattern="[\d\s\-\+\(\)]{10,15}"
+                    title="Please enter a valid phone number (10-15 characters)"
                     placeholder="+1 (555) 123-4567"
                   />
                 </div>
