@@ -74,37 +74,47 @@ const orderSchema = new mongoose.Schema(
     },
     tableNumber: {
       type: Number,
-      required: function () { return this.orderType === 'dine-in'; }
+      required: function () {
+        return this.orderType === "dine-in";
+      },
     },
     table: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Table",
-      default: null
+      default: null,
     },
     deliveryAddress: {
       street: {
         type: String,
-        required: function () { return this.orderType === 'delivery'; },
-        maxlength: [200, 'Street address cannot exceed 200 characters']
+        required: function () {
+          return this.orderType === "delivery";
+        },
+        maxlength: [200, "Street address cannot exceed 200 characters"],
       },
       city: {
         type: String,
-        required: function () { return this.orderType === 'delivery'; },
-        maxlength: [50, 'City name cannot exceed 50 characters']
+        required: function () {
+          return this.orderType === "delivery";
+        },
+        maxlength: [50, "City name cannot exceed 50 characters"],
       },
       postalCode: {
         type: String,
-        required: function () { return this.orderType === 'delivery'; },
-        match: [/^[0-9]{5,10}$/, 'Please enter a valid postal code']
+        required: function () {
+          return this.orderType === "delivery";
+        },
+        match: [/^[0-9]{5,10}$/, "Please enter a valid postal code"],
       },
       phone: {
         type: String,
-        required: function () { return this.orderType === 'delivery'; },
-        match: [/^[\d\s\-\+\(\)]{10,15}$/, 'Please enter a valid phone number']
+        required: function () {
+          return this.orderType === "delivery";
+        },
+        match: [/^[\d\s\-\+\(\)]{10,15}$/, "Please enter a valid phone number"],
       },
       notes: {
         type: String,
-        maxlength: [500, 'Notes cannot exceed 500 characters']
+        maxlength: [500, "Notes cannot exceed 500 characters"],
       },
     },
     orderNotes: {

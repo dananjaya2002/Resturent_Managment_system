@@ -1,6 +1,6 @@
-import { Navigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import LoadingSpinner from './LoadingSpinner';
+import { Navigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import LoadingSpinner from "./LoadingSpinner";
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const { user, loading } = useAuth();
@@ -15,25 +15,27 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
 
   if (allowedRoles && !allowedRoles.includes(user.role)) {
     return (
-      <div style={{ padding: '40px', textAlign: 'center' }}>
-        <h2 style={{ color: '#e74c3c', marginBottom: '16px' }}>🚫 Access Denied</h2>
-        <p style={{ color: '#666', marginBottom: '20px' }}>
+      <div style={{ padding: "40px", textAlign: "center" }}>
+        <h2 style={{ color: "#e74c3c", marginBottom: "16px" }}>
+          🚫 Access Denied
+        </h2>
+        <p style={{ color: "#666", marginBottom: "20px" }}>
           You don't have permission to access this page.
         </p>
-        <p style={{ color: '#999' }}>
+        <p style={{ color: "#999" }}>
           Your role: <strong>{user.role}</strong>
         </p>
-        <button 
+        <button
           onClick={() => window.history.back()}
           style={{
-            marginTop: '20px',
-            padding: '12px 24px',
-            background: '#3498db',
-            color: 'white',
-            border: 'none',
-            borderRadius: '4px',
-            cursor: 'pointer',
-            fontSize: '16px'
+            marginTop: "20px",
+            padding: "12px 24px",
+            background: "#3498db",
+            color: "white",
+            border: "none",
+            borderRadius: "4px",
+            cursor: "pointer",
+            fontSize: "16px",
           }}
         >
           Go Back

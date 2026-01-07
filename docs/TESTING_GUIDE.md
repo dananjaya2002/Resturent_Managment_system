@@ -5,6 +5,7 @@ This guide provides step-by-step instructions to test all the bug fixes implemen
 ## Prerequisites
 
 Before testing, ensure:
+
 1. MongoDB is running
 2. Backend server is running on port 5000 (or your configured port)
 3. Frontend is running on port 5173 (or your configured port)
@@ -13,6 +14,7 @@ Before testing, ensure:
 ### Creating Test Users
 
 If you don't have test users, create them with these roles:
+
 - **Customer** (for placing orders)
 - **Chef** (for kitchen operations)
 - **Waiter** (for table service)
@@ -29,6 +31,7 @@ You can register these users through the `/register` page or use a seeding scrip
 **What was fixed:** Orders are now filtered by role instead of by creator.
 
 ### Test as Chef:
+
 1. Log in as a **Chef** user
 2. Navigate to `/chef` dashboard
 3. **Expected:** You should see orders with status: `pending`, `confirmed`, or `preparing`
@@ -37,6 +40,7 @@ You can register these users through the `/register` page or use a seeding scrip
 6. **Expected:** Chef should now see this order
 
 ### Test as Waiter:
+
 1. Log in as a **Waiter** user
 2. Navigate to `/waiter` dashboard
 3. **Expected:** You should see ALL active dine-in orders (not delivered/cancelled)
@@ -45,6 +49,7 @@ You can register these users through the `/register` page or use a seeding scrip
 6. **Expected:** Waiter should see the new dine-in order
 
 ### Test as Cashier:
+
 1. Log in as a **Cashier** user
 2. Navigate to `/cashier` dashboard
 3. **Expected:** You should see orders with status: `ready` or `delivered`
@@ -53,12 +58,14 @@ You can register these users through the `/register` page or use a seeding scrip
 6. **Expected:** Cashier should now see this order
 
 ### Test as Admin/Manager/Owner:
+
 1. Log in as **Admin**, **Manager**, or **Owner**
 2. Navigate to respective dashboard
 3. **Expected:** You should see ALL orders regardless of status
 4. **Expected:** Complete order history is visible
 
 ### Test as Customer:
+
 1. Log in as a **Customer**
 2. Navigate to `/orders`
 3. **Expected:** You should ONLY see your own orders
@@ -71,6 +78,7 @@ You can register these users through the `/register` page or use a seeding scrip
 **What was fixed:** Cart is now stored per user ID, preventing cross-contamination.
 
 ### Test Cart Isolation:
+
 1. Open browser 1 (or regular window)
 2. Log in as **Customer A**
 3. Add items to cart (e.g., 2x Burger, 1x Pizza)
@@ -85,6 +93,7 @@ You can register these users through the `/register` page or use a seeding scrip
 12. **Expected:** Cart should be EMPTY for Cashier (different user)
 
 ### Test Guest Cart Isolation:
+
 1. Open browser without logging in (guest)
 2. Add items to cart
 3. Note the cart contents
@@ -100,6 +109,7 @@ You can register these users through the `/register` page or use a seeding scrip
 **What was fixed:** Only customers can create orders through the API.
 
 ### Test Staff Cannot Order:
+
 1. Log in as **Chef**
 2. Try to navigate to `/checkout`
 3. **Expected:** Access Denied message (route is protected)
@@ -107,6 +117,7 @@ You can register these users through the `/register` page or use a seeding scrip
 5. **Expected:** Cart functionality should work but checkout is blocked
 
 ### Test Customer Can Order:
+
 1. Log in as **Customer**
 2. Add items to cart
 3. Navigate to `/checkout`
@@ -116,6 +127,7 @@ You can register these users through the `/register` page or use a seeding scrip
 7. **Expected:** Order is created successfully
 
 ### Test API Directly (Optional):
+
 1. Get JWT token for a **Waiter** user
 2. Make POST request to `/api/orders` with waiter token
 3. **Expected:** Response: 403 Forbidden or "Not authorized"
@@ -130,6 +142,7 @@ You can register these users through the `/register` page or use a seeding scrip
 **What was fixed:** Orders now reference the table for dine-in orders.
 
 ### Test Table Validation:
+
 1. Log in as **Customer**
 2. Add items to cart
 3. Go to checkout
@@ -139,6 +152,7 @@ You can register these users through the `/register` page or use a seeding scrip
 7. **Expected:** Error message: "Table 999 not found"
 
 ### Test Valid Table Order:
+
 1. First, create a table (as Admin):
    - Navigate to `/admin` or use tables endpoint
    - Create table with number 5, capacity 4
@@ -158,6 +172,7 @@ You can register these users through the `/register` page or use a seeding scrip
 **What was fixed:** New endpoint to fetch orders by table number.
 
 ### Test as Waiter:
+
 1. Create 2-3 dine-in orders for table number 5
 2. Create 1-2 dine-in orders for table number 3
 3. Log in as **Waiter**
@@ -167,6 +182,7 @@ You can register these users through the `/register` page or use a seeding scrip
 7. **Expected:** Active orders only (not delivered/cancelled)
 
 ### Test Access Control:
+
 1. Try to access `GET /api/orders/by-table/5` as **Customer**
 2. **Expected:** 403 Forbidden (customers can't access this endpoint)
 3. Try as **Waiter**, **Cashier**, **Admin**
@@ -179,6 +195,7 @@ You can register these users through the `/register` page or use a seeding scrip
 **What was fixed:** Added constraints for inventory, delivery addresses, and categories.
 
 ### Test Inventory Validation:
+
 1. Log in as **Admin** or **Manager**
 2. Navigate to `/inventory`
 3. Try to add item with name longer than 100 characters
@@ -191,6 +208,7 @@ You can register these users through the `/register` page or use a seeding scrip
 10. **Expected:** Only predefined categories available (Meat, Vegetables, Dairy, etc.)
 
 ### Test Delivery Address Validation:
+
 1. Log in as **Customer**
 2. Go to checkout with delivery order
 3. Enter postal code: "ABC123" (invalid format)
@@ -209,6 +227,7 @@ You can register these users through the `/register` page or use a seeding scrip
 **What was fixed:** Added pattern validation and dropdowns to prevent invalid input.
 
 ### Test Checkout Form:
+
 1. Navigate to `/checkout` as customer
 2. Test each field:
    - Street: Try entering 250 characters
@@ -221,6 +240,7 @@ You can register these users through the `/register` page or use a seeding scrip
    - **Expected:** Form won't submit, shows validation message
 
 ### Test Inventory Form:
+
 1. Navigate to `/inventory` as admin/manager
 2. Click "Add New Item"
 3. Try to type in Category field
@@ -238,6 +258,7 @@ You can register these users through the `/register` page or use a seeding scrip
 **What was fixed:** Can now edit existing inventory items.
 
 ### Test Edit Inventory:
+
 1. Log in as **Admin** or **Manager**
 2. Navigate to `/inventory`
 3. Find an existing inventory item
@@ -251,6 +272,7 @@ You can register these users through the `/register` page or use a seeding scrip
 11. **Expected:** Changes are persisted (refresh page to verify)
 
 ### Test Edit Validation:
+
 1. Edit an item
 2. Try to change name to exceed 100 characters
 3. **Expected:** Validation error
@@ -264,6 +286,7 @@ You can register these users through the `/register` page or use a seeding scrip
 **What was fixed:** Only admin and manager can create/update/delete tables.
 
 ### Test as Manager:
+
 1. Log in as **Manager**
 2. Navigate to tables section (may need to access via admin panel or API)
 3. Try to create a new table
@@ -274,6 +297,7 @@ You can register these users through the `/register` page or use a seeding scrip
 8. **Expected:** Success - table is deleted
 
 ### Test as Waiter:
+
 1. Log in as **Waiter**
 2. Try to create table via API: `POST /api/tables`
 3. **Expected:** 403 Forbidden
@@ -285,6 +309,7 @@ You can register these users through the `/register` page or use a seeding scrip
 9. **Expected:** Success - waiters can change status
 
 ### Test as Admin:
+
 1. Log in as **Admin**
 2. Create, update, and delete tables
 3. **Expected:** All operations succeed
@@ -296,6 +321,7 @@ You can register these users through the `/register` page or use a seeding scrip
 **What was fixed:** Added error boundaries to catch errors and route guards to prevent unauthorized access.
 
 ### Test Route Protection:
+
 1. Log out or open incognito window
 2. Try to navigate directly to `/admin`
 3. **Expected:** Redirected to `/login`
@@ -309,6 +335,7 @@ You can register these users through the `/register` page or use a seeding scrip
 11. **Expected:** Success - customers can access checkout
 
 ### Test Error Boundary:
+
 1. Log in as any user
 2. Navigate to any protected page
 3. If a React error occurs (you can simulate by breaking component code)
@@ -318,6 +345,7 @@ You can register these users through the `/register` page or use a seeding scrip
 7. **Expected:** Error details available in expandable section
 
 ### Test Cross-Role Navigation:
+
 1. Log in as **Chef**
 2. Navigate to `/chef` - **Expected:** Success
 3. Try to navigate to `/waiter` - **Expected:** Access Denied
@@ -333,6 +361,7 @@ You can register these users through the `/register` page or use a seeding scrip
 **Note:** Some improvements are still pending. Test what's available:
 
 ### Test Loading Spinners:
+
 1. Navigate to any dashboard
 2. **Check:** Does a loading spinner appear while data loads?
 3. **Check:** Does "Loading..." text display?
@@ -372,6 +401,7 @@ Run through this quick checklist to verify all major fixes:
 For developers who want to test API endpoints directly:
 
 ### Test Order Visibility:
+
 ```bash
 # As Chef
 GET /api/orders
@@ -390,6 +420,7 @@ Expected: Only orders where user._id matches customer ID
 ```
 
 ### Test Order Creation Authorization:
+
 ```bash
 # As Customer (Should work)
 POST /api/orders
@@ -405,6 +436,7 @@ Expected: 403 Forbidden
 ```
 
 ### Test Orders By Table:
+
 ```bash
 # As Waiter (Should work)
 GET /api/orders/by-table/5
@@ -418,6 +450,7 @@ Expected: 403 Forbidden
 ```
 
 ### Test Table Management:
+
 ```bash
 # As Manager (Should work)
 POST /api/tables
@@ -444,6 +477,7 @@ Expected: 200 OK
 ```
 
 ### Test Inventory Validation:
+
 ```bash
 # Invalid quantity
 POST /api/inventory
@@ -505,7 +539,7 @@ After successful testing:
 
 ---
 
-**Testing completed by:** _________________  
-**Date:** _________________  
-**Environment:** _________________  
-**Overall Result:** ☐ Pass  ☐ Fail  ☐ Partial Pass
+**Testing completed by:** ********\_********  
+**Date:** ********\_********  
+**Environment:** ********\_********  
+**Overall Result:** ☐ Pass ☐ Fail ☐ Partial Pass

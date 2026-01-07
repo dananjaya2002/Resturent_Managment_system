@@ -7,7 +7,14 @@ const Table = require("../models/Table");
 // @access  Private
 const createOrder = async (req, res) => {
   try {
-    const { items, deliveryAddress, orderNotes, paymentMethod, orderType, tableNumber } = req.body;
+    const {
+      items,
+      deliveryAddress,
+      orderNotes,
+      paymentMethod,
+      orderType,
+      tableNumber,
+    } = req.body;
 
     // Validate items array
     if (!items || items.length === 0) {
@@ -15,14 +22,18 @@ const createOrder = async (req, res) => {
     }
 
     // Validate based on order type
-    if (orderType === 'dine-in') {
+    if (orderType === "dine-in") {
       if (!tableNumber) {
-        return res.status(400).json({ message: "Table number is required for dine-in orders" });
+        return res
+          .status(400)
+          .json({ message: "Table number is required for dine-in orders" });
       }
       // Find the table by tableNumber
       const table = await Table.findOne({ tableNumber });
       if (!table) {
-        return res.status(404).json({ message: `Table ${tableNumber} not found` });
+        return res
+          .status(404)
+          .json({ message: `Table ${tableNumber} not found` });
       }
     } else {
       // Default to delivery validation
@@ -76,7 +87,7 @@ const createOrder = async (req, res) => {
 
     // Find table reference if dine-in
     let tableRef = null;
-    if (orderType === 'dine-in' && tableNumber) {
+    if (orderType === "dine-in" && tableNumber) {
       const table = await Table.findOne({ tableNumber });
       if (table) {
         tableRef = table._id;
@@ -88,13 +99,13 @@ const createOrder = async (req, res) => {
       user: req.user._id,
       items: orderItems,
       totalAmount,
-      deliveryAddress: orderType === 'delivery' ? deliveryAddress : undefined,
+      deliveryAddress: orderType === "delivery" ? deliveryAddress : undefined,
       orderNotes,
       paymentMethod: paymentMethod || "cash",
       estimatedDeliveryTime,
-      orderType: orderType || 'delivery',
+      orderType: orderType || "delivery",
       tableNumber,
-      table: tableRef
+      table: tableRef,
     });
 
     // Populate order details
@@ -182,7 +193,7 @@ const getOrderById = async (req, res) => {
     const isAdmin = ["admin", "manager", "owner"].includes(req.user.role);
     const isOwner = order.user._id.toString() === req.user._id.toString();
     const isStaff = ["chef", "waiter", "cashier"].includes(req.user.role);
-    
+
     if (!isAdmin && !isOwner && !isStaff) {
       return res
         .status(403)
@@ -389,7 +400,7 @@ const getOrdersByTable = async (req, res) => {
 
     let query = {
       orderType: "dine-in",
-      tableNumber: parseInt(tableNumber)
+      tableNumber: parseInt(tableNumber),
     };
 
     // Filter by status if provided

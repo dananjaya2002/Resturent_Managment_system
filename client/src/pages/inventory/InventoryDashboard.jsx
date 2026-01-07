@@ -70,7 +70,7 @@ const InventoryDashboard = () => {
   };
 
   const handleEditItem = (item) => {
-    setEditingItem({...item});
+    setEditingItem({ ...item });
     setShowEditModal(true);
   };
 
@@ -85,7 +85,7 @@ const InventoryDashboard = () => {
           quantity: editingItem.quantity,
           unit: editingItem.unit,
           lowStockThreshold: editingItem.lowStockThreshold,
-          category: editingItem.category
+          category: editingItem.category,
         },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -194,7 +194,7 @@ const InventoryDashboard = () => {
                   )}
                 </td>
                 <td>
-                  <div style={{ display: 'flex', gap: '8px' }}>
+                  <div style={{ display: "flex", gap: "8px" }}>
                     <button
                       onClick={() => handleEditItem(item)}
                       className="action-btn edit-btn"

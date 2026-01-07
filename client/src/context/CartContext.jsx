@@ -25,7 +25,7 @@ const getGuestSessionId = () => {
 
 export const CartProvider = ({ children }) => {
   const { user } = useAuth();
-  
+
   // Determine cart key based on user or guest session
   const getCartKey = () => {
     if (user) {
@@ -73,7 +73,6 @@ export const CartProvider = ({ children }) => {
       setCartItems([]);
     }
   }, [user]);
-
 
   // Add item to cart
   const addToCart = (menuItem, quantity = 1) => {

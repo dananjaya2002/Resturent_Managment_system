@@ -233,65 +233,100 @@ function App() {
                     <Route path="/login" element={<Login />} />
                     <Route path="/register" element={<Register />} />
                     <Route path="/menu" element={<Menu />} />
-                    
+
                     {/* Protected Routes */}
-                    <Route path="/settings" element={
-                      <ProtectedRoute>
-                        <Settings />
-                      </ProtectedRoute>
-                    } />
-                    <Route path="/checkout" element={
-                      <ProtectedRoute allowedRoles={['customer']}>
-                        <Checkout />
-                      </ProtectedRoute>
-                    } />
-                    <Route path="/orders" element={
-                      <ProtectedRoute>
-                        <OrderHistory />
-                      </ProtectedRoute>
-                    } />
-                    <Route path="/orders/:orderId" element={
-                      <ProtectedRoute>
-                        <OrderTracking />
-                      </ProtectedRoute>
-                    } />
-                    
+                    <Route
+                      path="/settings"
+                      element={
+                        <ProtectedRoute>
+                          <Settings />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/checkout"
+                      element={
+                        <ProtectedRoute allowedRoles={["customer"]}>
+                          <Checkout />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/orders"
+                      element={
+                        <ProtectedRoute>
+                          <OrderHistory />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/orders/:orderId"
+                      element={
+                        <ProtectedRoute>
+                          <OrderTracking />
+                        </ProtectedRoute>
+                      }
+                    />
+
                     {/* Role-based Protected Routes */}
-                    <Route path="/admin" element={
-                      <ProtectedRoute allowedRoles={['admin']}>
-                        <AdminDashboard />
-                      </ProtectedRoute>
-                    } />
-                    <Route path="/waiter" element={
-                      <ProtectedRoute allowedRoles={['waiter']}>
-                        <WaiterDashboard />
-                      </ProtectedRoute>
-                    } />
-                    <Route path="/chef" element={
-                      <ProtectedRoute allowedRoles={['chef']}>
-                        <ChefDashboard />
-                      </ProtectedRoute>
-                    } />
-                    <Route path="/cashier" element={
-                      <ProtectedRoute allowedRoles={['cashier']}>
-                        <CashierDashboard />
-                      </ProtectedRoute>
-                    } />
-                    <Route path="/manager" element={
-                      <ProtectedRoute allowedRoles={['manager']}>
-                        <ManagerDashboard />
-                      </ProtectedRoute>
-                    } />
-                    <Route path="/owner" element={
-                      <ProtectedRoute allowedRoles={['owner']}>
-                        <OwnerDashboard />
-                      </ProtectedRoute>
-                    } />
-                    <Route path="/inventory" element={
-                      <ProtectedRoute allowedRoles={['manager', 'owner', 'chef', 'admin']}>
-                        <InventoryDashboard />
-                      </ProtectedRoute>
-                    } />
+                    <Route
+                      path="/admin"
+                      element={
+                        <ProtectedRoute allowedRoles={["admin"]}>
+                          <AdminDashboard />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/waiter"
+                      element={
+                        <ProtectedRoute allowedRoles={["waiter"]}>
+                          <WaiterDashboard />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/chef"
+                      element={
+                        <ProtectedRoute allowedRoles={["chef"]}>
+                          <ChefDashboard />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/cashier"
+                      element={
+                        <ProtectedRoute allowedRoles={["cashier"]}>
+                          <CashierDashboard />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/manager"
+                      element={
+                        <ProtectedRoute allowedRoles={["manager"]}>
+                          <ManagerDashboard />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/owner"
+                      element={
+                        <ProtectedRoute allowedRoles={["owner"]}>
+                          <OwnerDashboard />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/inventory"
+                      element={
+                        <ProtectedRoute
+                          allowedRoles={["manager", "owner", "chef", "admin"]}
+                        >
+                          <InventoryDashboard />
+                        </ProtectedRoute>
+                      }
+                    />
                   </Routes>
                 </main>
               </div>
