@@ -7,6 +7,7 @@ This guide will help you run the Restaurant Management System using Docker and D
 Before you begin, make sure you have the following installed:
 
 - **Docker Desktop** (version 20.10 or higher)
+
   - Windows: [Download Docker Desktop for Windows](https://www.docker.com/products/docker-desktop/)
   - Mac: [Download Docker Desktop for Mac](https://www.docker.com/products/docker-desktop/)
   - Linux: Install Docker Engine and Docker Compose
@@ -51,6 +52,7 @@ docker-compose up --build
 ```
 
 This command will:
+
 - Build Docker images for the server and client
 - Download MongoDB image
 - Create a network for the containers
@@ -71,14 +73,17 @@ Once all containers are running (you'll see logs), open your browser:
 ## 🎯 What Gets Created
 
 ### Containers
+
 1. **restaurant_client** - Nginx serving React frontend (port 80)
 2. **restaurant_server** - Node.js Express backend (port 5000)
 3. **restaurant_mongodb** - MongoDB database (port 27017)
 
 ### Network
+
 - **restaurant-network** - Internal network for container communication
 
 ### Volumes
+
 - **mongodb_data** - Persistent MongoDB data (survives container restarts)
 - **./server/public/images** - Uploaded images (menu items, categories)
 
@@ -112,13 +117,13 @@ exit
 
 ### Default Test Users (After Seeding)
 
-| Email | Password | Role |
-|-------|----------|------|
-| admin@restaurant.com | admin123 | Admin |
-| manager@restaurant.com | manager123 | Manager |
-| chef@restaurant.com | chef123 | Chef |
-| waiter@restaurant.com | waiter123 | Waiter |
-| cashier@restaurant.com | cashier123 | Cashier |
+| Email                   | Password    | Role     |
+| ----------------------- | ----------- | -------- |
+| admin@restaurant.com    | admin123    | Admin    |
+| manager@restaurant.com  | manager123  | Manager  |
+| chef@restaurant.com     | chef123     | Chef     |
+| waiter@restaurant.com   | waiter123   | Waiter   |
+| cashier@restaurant.com  | cashier123  | Cashier  |
 | customer@restaurant.com | customer123 | Customer |
 
 ---
@@ -126,6 +131,7 @@ exit
 ## 🔧 Common Docker Commands
 
 ### Start Containers (After First Build)
+
 ```bash
 # Start in foreground (see logs)
 docker-compose up
@@ -135,6 +141,7 @@ docker-compose up -d
 ```
 
 ### Stop Containers
+
 ```bash
 # Stop all containers (keeps data)
 docker-compose down
@@ -144,6 +151,7 @@ docker-compose down -v
 ```
 
 ### View Logs
+
 ```bash
 # All containers
 docker-compose logs
@@ -158,6 +166,7 @@ docker-compose logs mongodb
 ```
 
 ### Restart a Service
+
 ```bash
 # Restart specific service
 docker-compose restart server
@@ -168,6 +177,7 @@ docker-compose restart
 ```
 
 ### Rebuild After Code Changes
+
 ```bash
 # Rebuild specific service
 docker-compose build server
@@ -178,6 +188,7 @@ docker-compose up --build
 ```
 
 ### Access Container Shell
+
 ```bash
 # Server container
 docker exec -it restaurant_server sh
@@ -230,6 +241,7 @@ docker exec restaurant_mongodb mongorestore /backup
 ### Problem: Containers won't start
 
 **Check if ports are already in use:**
+
 ```bash
 # Windows
 netstat -ano | findstr "80"
@@ -243,25 +255,29 @@ lsof -i :27017
 ```
 
 **Solution:** Stop other services using these ports or change ports in `docker-compose.yml`:
+
 ```yaml
 ports:
-  - "8080:80"    # Change frontend to port 8080
-  - "5001:5000"  # Change backend to port 5001
+  - "8080:80" # Change frontend to port 8080
+  - "5001:5000" # Change backend to port 5001
 ```
 
 ### Problem: MongoDB connection failed
 
 **Check MongoDB is running:**
+
 ```bash
 docker-compose ps
 ```
 
 **View MongoDB logs:**
+
 ```bash
 docker-compose logs mongodb
 ```
 
 **Restart MongoDB:**
+
 ```bash
 docker-compose restart mongodb
 ```
@@ -269,16 +285,19 @@ docker-compose restart mongodb
 ### Problem: Frontend shows "Cannot connect to server"
 
 **Check server is running:**
+
 ```bash
 docker-compose logs server
 ```
 
 **Test API directly:**
+
 ```bash
 curl http://localhost:5000/api/auth/test
 ```
 
 **Common causes:**
+
 - Server container crashed (check logs)
 - Database connection failed (check MongoDB)
 - Nginx proxy misconfigured (check `client/nginx.conf`)
@@ -286,18 +305,21 @@ curl http://localhost:5000/api/auth/test
 ### Problem: Changes not reflecting
 
 **For server code changes:**
+
 ```bash
 docker-compose build server
 docker-compose up -d server
 ```
 
 **For client code changes:**
+
 ```bash
 docker-compose build client
 docker-compose up -d client
 ```
 
 **For complete rebuild:**
+
 ```bash
 docker-compose down
 docker-compose up --build
@@ -306,6 +328,7 @@ docker-compose up --build
 ### Problem: Out of disk space
 
 **Clean up Docker resources:**
+
 ```bash
 # Remove stopped containers
 docker container prune
@@ -344,10 +367,12 @@ docker-compose up --build
 For production deployment, consider:
 
 1. **Use MongoDB Atlas** instead of local MongoDB:
+
    - Update `MONGO_URI` in `.env.docker`
    - Remove `mongodb` service from `docker-compose.yml`
 
 2. **Add MongoDB authentication:**
+
    ```yaml
    mongodb:
      environment:
@@ -356,11 +381,13 @@ For production deployment, consider:
    ```
 
 3. **Use environment-specific compose files:**
+
    ```bash
    docker-compose -f docker-compose.yml -f docker-compose.prod.yml up
    ```
 
 4. **Enable SSL/HTTPS:**
+
    - Add reverse proxy (Traefik, Nginx)
    - Use Let's Encrypt for certificates
 
