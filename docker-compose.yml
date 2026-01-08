@@ -1,0 +1,65 @@
+version: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:7
+    container_name: restaurant_mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    environment:
+      - MONGO_INITDB_DATABASE=restaurant_db
+    networks:
+      - restaurant-network
+
+  # Backend Server
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: restaurant_server
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    env_file:
+      - .env.docker
+    environment:
+      - NODE_ENV=production
+      - PORT=5000
+      - MONGO_URI=mongodb://mongodb:27017/restaurant_db
+    depends_on:
+      - mongodb
+    volumes:
+      # Persistent storage for uploaded images
+      - ./server/public/images:/app/public/images
+    networks:
+      - restaurant-network
+
+  # Frontend Client
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        - VITE_API_URL=/api
+    container_name: restaurant_client
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - server
+    networks:
+      - restaurant-network
+
+# Named volumes
+volumes:
+  mongodb_data:
+    driver: local
+
+# Custom network
+networks:
+  restaurant-network:
+    driver: bridge
