@@ -19,6 +19,7 @@ This will create demo accounts with the following credentials:
 | Owner    | owner@resto.com        | owner123     |
 | Manager  | manager@resto.com      | manager123   |
 | Chef     | chef@resto.com         | chef123      |
+
 | Waiter   | waiter@resto.com       | waiter123    |
 | Cashier  | cashier@resto.com      | cashier123   |
 | Customer | customer@resto.com     | customer123  |

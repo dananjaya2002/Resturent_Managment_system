@@ -46,7 +46,7 @@ describe("Order API Tests", () => {
           _id: "mockUserId123",
           name: "Test User",
           email: "user@test.com",
-          role: "user",
+          role: "customer",
         }),
       });
 
@@ -147,7 +147,7 @@ describe("Order API Tests", () => {
       User.findById.mockReturnValue({
         select: jest.fn().mockResolvedValue({
           _id: "mockUserId123",
-          role: "user",
+          role: "customer",
         }),
       });
 
